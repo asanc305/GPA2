@@ -925,7 +925,6 @@ JOIN
     $stmt->bind_result($creditsTaken, $creditsLeft);
     $output = array();
     while ($stmt->fetch()) {
-        
         array_push($output, array(
             $creditsTaken,
             $creditsLeft
