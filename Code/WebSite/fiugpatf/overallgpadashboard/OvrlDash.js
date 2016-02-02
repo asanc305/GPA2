@@ -577,52 +577,52 @@
 
 						}
 
-if (GPANeeded <= 4 && GPANeeded > 3.7){
-var gradeneeded = "A";				
+                    if (GPANeeded <= 4 && GPANeeded > 3.7){
+                    var gradeneeded = "A";
 			 
 							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
 
 
 						}
 
-if (GPANeeded <= 3.67 && GPANeeded > 3.33){
-var gradeneeded = "A-";				
+                    if (GPANeeded <= 3.67 && GPANeeded > 3.33){
+                    var gradeneeded = "A-";
 			 
 							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
 
 
 						}
-if (GPANeeded <= 3.33 && GPANeeded > 3.0){
-var gradeneeded = "B+";				
+                    if (GPANeeded <= 3.33 && GPANeeded > 3.0){
+                    var gradeneeded = "B+";
+
+							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
+
+
+						}
+                    if (GPANeeded <= 3.0 && GPANeeded > 2.67){
+                    var gradeneeded = "B";
 			 
 							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
 
 
 						}
-if (GPANeeded <= 3.0 && GPANeeded > 2.67){
-var gradeneeded = "B";				
-			 
-							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-
-
-						}
-if (GPANeeded <= 2.67 && GPANeeded > 2.33){
-var gradeneeded = "B-";				
+                    if (GPANeeded <= 2.67 && GPANeeded > 2.33){
+                    var gradeneeded = "B-";
 			 
 							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
 
 
 						}
 
-if (GPANeeded <= 2.30 && GPANeeded > 2.0){
-var gradeneeded = "C+";				
+                    if (GPANeeded <= 2.30 && GPANeeded > 2.0){
+                    var gradeneeded = "C+";
 			 
 							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
 
 
 						}
-if (GPANeeded <= 2.0 && GPANeeded > 0){
-var gradeneeded = "C";				
+                    if (GPANeeded <= 2.0 && GPANeeded > 0){
+                    var gradeneeded = "C";
 			 
 							                 alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
 
