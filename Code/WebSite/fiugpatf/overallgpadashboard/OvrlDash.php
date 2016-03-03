@@ -424,7 +424,7 @@ if ($action == "findChildBuckets") {
     if ($query = $mysqli->prepare("SELECT description, allRequired, parentID FROM MajorBucket WHERE  majorID in (SELECT majorID FROM StudentMajor WHERE userID = '" . $userID . "') and parentID in (select bucketID FROM MajorBucket where description = '" . $bucket . "')")) {
         $query->execute();
         $query->store_result();
-        $query->bind_result($output10);
+        $query->bind_result($output10, $d, $e);
         $query->fetch();
         
         if ($query->num_rows() > 0) {
@@ -582,10 +582,10 @@ if ($action == "addCourse") {
 
 if ($action == "courseTaken1") {
     $user = $_SESSION['username'];
-    $stmt = $mysqli->prepare("SELECT CourseInfo.courseID, CourseInfo.credits, StudentCourse.grade FROM StudentCourse INNER JOIN CourseInfo ON StudentCourse.courseInfoID = CourseInfo.courseInfoID WHERE  StudentCourse.userID in (SELECT userID FROM Users WHERE userName ='" . $users . "' ) AND CourseInfo.courseInfoID in (SELECT courseInfoID FROM MajorBucketRequiredCourses WHERE bucketID = '1')");
+    $stmt = $mysqli->prepare("SELECT CourseInfo.courseID, CourseInfo.credits, StudentCourse.grade FROM StudentCourse INNER JOIN CourseInfo ON StudentCourse.courseInfoID = CourseInfo.courseInfoID WHERE  StudentCourse.userID in (SELECT userID FROM Users WHERE userName = ? ) AND CourseInfo.courseInfoID in (SELECT courseInfoID FROM MajorBucketRequiredCourses WHERE bucketID = '1')");
     $stmt->bind_param('s', $user);
     $stmt->execute();
-    $stmt->bind_result($suser, $CID, $credit, $grd);
+    $stmt->bind_result($CID, $credit, $grd);
     $output = array();
     while ($stmt->fetch()) {
         array_push($output, array(

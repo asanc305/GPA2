@@ -142,6 +142,8 @@ if($action == "importWhatif") {
 			InsertNeeded($neededCourses, $user);
 
 			shell_exec('rm -rf ' . $username);
+
+         toLog(1, "Info", "settings.php/gpaImport", "GPA Audit Imported");
 		}
 	}
 }
