@@ -91,7 +91,7 @@ ul ol {
 }
 
 .footer {
-    height: 20em;
+    height: 10em;
     background-color: #E6C12B;
     border-bottom: 2px solid #000;
     border-top: 1px solid #112d54;
@@ -388,7 +388,7 @@ background-color: #fff;
 	margin-top: -40px;
     width: 10.5%;
 	height: auto;
-float:top;
+    float:top;
 }
 
 .importButton ul {
@@ -397,9 +397,6 @@ float:top;
 
 .importButton ul li {
     display: inline-block;
-   
-    
-    
     font-size: .9em;
 }
 
@@ -724,7 +721,4 @@ ul.dropdown-menu {
 
 	padding-bottom: 150px;
 }
-
-}
-
 

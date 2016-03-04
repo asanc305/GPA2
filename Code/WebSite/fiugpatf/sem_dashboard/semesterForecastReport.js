@@ -1,6 +1,7 @@
 
 $(document).ready(function() {
     start();
+    GenerateSemesterForecast();
 } );
 
 var currCourse;
@@ -109,7 +110,7 @@ function start() {
     $("#generateSemesterForecast").click(function() {
 
         setTimeout(function() {
-            CheckSemesterForecast();
+            window.open("semesterForecastReport.html", "Semester GPA Forecast Report");   // Opens a new window
         }, 1000);
 
     });
@@ -373,14 +374,35 @@ function download(filename, text) {
    }
 }
 
-function CheckSemesterForecast() {
+function GenerateSemesterForecast() {
     var creditsTaken = 0;
     var creditsLeft = 0;
     var GPAGoal = 0;
     var totalGradePoints = 0;
     var allCourseCredits = 0;
+    var creditsInProgress;
+    var accurateGPA;
     var currentURL = 'current.php';
     var classesImported = true;
+
+
+    $.ajax({
+        type: 'POST',
+        async: false,
+        url: currentURL,
+        dataType: 'json',
+        data: {
+            action: 'GPAGoal'
+        },
+        success: function(data) {
+
+            GPAGoal = data[0][0];
+
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
+    });
 
     $.ajax({
         type: 'POST',
@@ -391,8 +413,6 @@ function CheckSemesterForecast() {
             action: 'TakenAndRemaining'
         },
         success: function(data) {
-
-            GPAGoal = $("#data p:first").text();
 
             creditsTaken = parseInt(data[0][0]);
             creditsLeft = parseInt(data[0][1]);
@@ -407,7 +427,6 @@ function CheckSemesterForecast() {
     });
 
     if (classesImported) {
-
         $.ajax({
             type: 'POST',
             async: false,
@@ -417,8 +436,6 @@ function CheckSemesterForecast() {
                 action: 'TakenAndRemaining'
             },
             success: function(data) {
-
-                GPAGoal = $("#data p:first").text();
 
                 creditsTaken = parseInt(data[0][0]);
                 creditsLeft = parseInt(data[0][1]);
@@ -505,12 +522,13 @@ function CheckSemesterForecast() {
 
         //calculate maxGoalGpa
         var maxGoalGPA = ((totalGradePoints +(creditsLeft * 4)) / (allCourseCredits + creditsLeft)).toFixed(2);
+        accurateGPA = (totalGradePoints / allCourseCredits);
 
-
-        if(GPAGoal > maxGoalGPA) { //DO NOT run report - goal unattainable
-            alert("Goal GPA of " + GPAGoal + " cannot be obtained by the time of graduation.\nPlease speak to your adviser for further assistane.");
+        if(GPAGoal > maxGoalGPA) {
+            //alert("Goal GPA of " + GPAGoal + " cannot be obtained by the time of graduation.\nPlease speak to your adviser for further assistance.");
         }
-        else { //GPA Goal is attainable
+        else {
+
             var courseName = new Array();
             var courseID = new Array();
             var creditsIP = new Array();
@@ -542,10 +560,18 @@ function CheckSemesterForecast() {
                 }
             });
 
-            for(var i = 0; i < weight.length; i++) {
-                if(relevance[i] <= 0 || weight[i] <= 0 || relevance[i] > 3 || weight[i] > 0) { //check to see if either relevance or weight = 0 or >3
+            //breakdown GoalGPA over remaining semesters assuming student takes 4 classes per semester
+            var GPARemainingForGoal = GPAGoal - accurateGPA;
+            var semestersRemaining = Math.ceil(creditsLeft / 12);
+            var semesterGoal = accurateGPA + (GPARemainingForGoal / semestersRemaining);
+            var semesterGradePoints = (GPAGoal * (allCourseCredits + creditsInProgress)) - totalGradePoints;
 
-                    if((relevance[i] <= 0 && weight[i] <= 0) || (relevance[i] > 3 && weight[i] > 0)) { //if both = 0 or 3, prompt for both values
+            //calculate estimatedSemesterGradePoints based on weight and relevance
+            var relevanceUpdated = false;
+            for(var i = 0; i < weight.length; i++) {
+                if(relevance[i] == 0 || weight[i] == 0) { //check to see if either relevance or weight = 0
+
+                    if(relevance[i] == 0 && weight[i] == 0) { //if both = 0, prompt for both values
                         relevance[i] = prompt("Enter Relevance (0-3) for " + courseName[i] + " - " + courseID[i], "0 = No Relevance, 3 = Completely Relevant");
                         weight[i] = prompt("Enter Weight (1-3) for " + courseName[i] + " - " + courseID[i], "1 = Easy, 3 = Hard");
                         $.ajax({
@@ -567,7 +593,7 @@ function CheckSemesterForecast() {
                             }
                         });
                     }
-                    else if(weight[i] <= 0 || weight[i] > 3) { //if only weight = 0 or > 3, prompt for weight
+                    else if(weight[i] == 0) { //if only weight = 0, prompt for weight
                         weight[i] = prompt("Enter Weight for " + courseName[i] + " - " + courseID[i], "1 = Easy, 3 = Hard");
                         $.ajax({
                             type: 'POST',
@@ -591,8 +617,180 @@ function CheckSemesterForecast() {
                 }
             }
 
-            alert("Ready For Forecast");
-            window.open("semesterForecastReport.html", "Semester GPA Forecast Report");   // Opens a new window
+            var relevanceMax = new Array();
+            var lowestRelevance;
+            var arrNum;
+            var estimatedGradePoints;
+
+            function estimatedSemesterGradePoints() {
+                estimatedGradePoints = 0;
+
+                for (var i = 0; i < relevance.length; i++) {
+                    if (relevance[i] == 3.5) {
+                        relevanceMax[i] = 1; //1 means at MAX RELEVANCE
+                    }
+                    else {
+                        relevanceMax[i] = 0; //0 means NOT at MAX RELEVANCE
+                    }
+                }
+
+                for (var z = 0; z < relevance.length; z++) {
+                    var gradeValue = 0;
+
+                    switch (relevance[z]) {
+                        case 3.5:
+                            gradeValue = 4.00;
+                            break;
+                        case 3:
+                            gradeValue = 3.67;
+                            break;
+                        case 2.5:
+                            gradeValue = 3.33;
+                            break;
+                        case 2:
+                            gradeValue = 3.00;
+                            break;
+                        case 1.5:
+                            gradeValue = 2.67;
+                            break;
+                        case 1:
+                            gradeValue = 2.33;
+                            break;
+                        case 0:
+                            gradeValue = 2.00;
+                            break;
+                        default:
+                            //error: relevance value is not a valid number
+                            break;
+                    }
+
+                    estimatedGradePoints += (creditsIP[z] * gradeValue);
+                }
+
+                return estimatedGradePoints;
+            }
+
+            do {
+                var EGP = estimatedSemesterGradePoints();
+                var successful = false;
+
+                if(EGP < semesterGradePoints) { //in theory, shouldn't enter if EGP is greater than SGP
+
+                    var maxedOut = true; //each class has reached a max grade of 4.0
+                    lowestRelevance = 0;
+                    arrNum = 0;
+
+                    for(var j = 0; j < relevanceMax.length; j++) { //check to see if courses aren't maxedOut yet
+                        if (relevanceMax[j] == 0) { //there exists a class that is not maxedOut
+                            lowestRelevance = relevance[j];
+                            arrNum = j;
+                            maxedOut = false;
+                            //alert(arrNum + "-array is not maxedOut" + "\nlowestRelevance: " + lowestRelevance + "\narrNum: " + arrNum);
+                            break;
+                        }
+                    }
+
+                    if(maxedOut) { //all courses have been maxedOut, so break the do-while
+                        break;
+                    }
+
+                    for(var x = arrNum; x < relevance.length; x++) { //loop starts at first non-maxedOut value
+                        if(relevanceMax[x] != 1) {
+                            if(lowestRelevance > relevance[x]) {
+                                lowestRelevance = relevance[x];
+                                arrNum = x;
+                            }
+                        }
+                    }
+
+                    //increase relevance value
+                    if(relevance[arrNum] == 0) {
+                        relevance[arrNum] = 1;
+                        relevanceUpdated = true;
+                    }
+                    else {
+                        //alert("Time to update!")
+                        relevance[arrNum] += 0.5;
+                        relevanceUpdated = true;
+                        if(relevance[arrNum] == 3.5) {
+                            relevanceMax[arrNum] = 1;
+                        }
+                    }
+                }
+                else {
+                    successful = true;
+                }
+            } while(!successful);
+
+            //calculate secureGPAPath
+            var secureGPAPath = new Array();
+            for(var i = 0; i < relevance.length; i++) {
+                if(relevance[i] <= 2.5) {
+                    secureGPAPath[i] = relevance[i] + 1;
+                }
+                else if(relevance[i] == 3) {
+                    secureGPAPath[i] = relevance[i] + 0.5;
+                }
+                else {
+                    secureGPAPath[i] = relevance[i];
+                }
+            }
+
+            function valueToChar(value) {
+                var letter;
+                switch (value) {
+                    case 3.5:
+                        letter = 'A';
+                        break;
+                    case 3:
+                        letter = 'A-';
+                        break;
+                    case 2.5:
+                        letter = 'B+';
+                        break;
+                    case 2:
+                        letter = 'B';
+                        break;
+                    case 1.5:
+                        letter = 'B-';
+                        break;
+                    case 1:
+                        letter = 'C+';
+                        break;
+                    case 0:
+                        letter = 'C';
+                        break;
+                    default:
+                        //error: relevance value is not a valid number
+                        break;
+                }
+                return letter;
+            }
+
+            //calculate minimumStudyTime from (relevance * weight)
+            var minimumStudyTime = new Array();
+            for(var j = 0; j < relevance.length; j++) {
+                minimumStudyTime[j] = Math.floor(relevance[j]) * weight[j];
+            }
+
+            $("#sum").append('<p id="heading" align="center"><strong>Current GPA:</strong> ' + accurateGPA.toFixed(2) + '<br><strong>Graduation Goal GPA:</strong> ' + GPAGoal + '<br><strong>Semester Goal GPA:</strong> ' + semesterGoal.toFixed(2) + '<br><strong>Credits Remaining:</strong> ' + creditsLeft + '<br></p><p>In order to your Graduation Goal GPA, the following forecast has been generated according to the weight and relevance you provided:</p>');
+
+            var content = "<table><tr><th>Class</th><th>Weight</th><th>Relevance</th><th>Min. Grade<br>Required</th><th>Secure<br>GPA Path</th><th>Estimated Study<br>Time (Hrs/Week)*</th></tr>";
+            for(var i = 0; i < courseID.length; i++) {
+                content += ("<tr><td>" + courseID[i] + "</td>" +
+                    "<td>" + weight[i] + "</td>" +
+                    "<td>" + relevance[i] + "</td>" +
+                    "<td>" + valueToChar(relevance[i]) + "</td>" +
+                    "<td>" + valueToChar(secureGPAPath[i]) + "</td>" +
+                    "<td>" + minimumStudyTime[i] + "</td></tr>");
+            }
+            content += "</table>";
+
+            $("#forecast_table").append(content);
+
+
+            $("#recommend").append('<p><i>*While only a recommendation, we highly recommend students to consider their circumstances and select an appropriate schedule based on their workload.</i></p>');
+
         }
     } else {
         alert("No classes are available to generate semester forecast.\n Please speak to an adviser for further assistance.");

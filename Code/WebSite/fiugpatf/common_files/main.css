@@ -88,8 +88,8 @@ ul ol {
 	padding-top:5em;
 }
 
-.footer{
-	height:20em;
+.footer {
+	height:10em;
 	background-color:#E6C12B;
 	border-bottom: 2px solid black;
 	border-top:1px solid #112d54;
@@ -181,14 +181,14 @@ ul ol {
 	font-family: "Arial";
 }
 
-#current_course {
+/*#current_course {
 	background-image: url("https://upload.wikimedia.org/wikipedia/commons/b/b0/FIU_Stadium.JPG");
 	background-size:   cover;               
     background-repeat: no-repeat;
     background-position: center center;
 	background-attachment: fixed;
 	font-family: "Arial";
-}
+}*/
 
 .tabButton{
 	width: 15em;

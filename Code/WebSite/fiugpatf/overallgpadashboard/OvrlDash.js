@@ -1,5 +1,5 @@
  $(document).ready(function() {
-     start();
+     start2();
  });
 
  function toggle() {
@@ -29,6 +29,16 @@
  var noes = 0;
  var met = 0;
  var gpa = 0;
+ var creditsTaken;
+ var creditsLeft;
+ var GPAGoal = 0;
+ var GradeNeeded = 0;
+ var GradeNeededFormatted = 0;
+ var totalGradePoints;
+ var allCourseCredits;
+ var creditsInProgress;
+ var accurateGPA;
+
 
  function sto_formatStoreManagerDetails(oTable, nTr) {
      var aData = oTable.fnGetData(nTr);
@@ -523,6 +533,7 @@
  }
 
  function GenerateForecast(data) {
+
      for (var i = 0; i < data.length; i++) {
          if (data[i][2] == "NO") {
              //alert("Out of " + noes + " buckets." + met +" have requirements satisfied");
@@ -536,83 +547,404 @@
 
      if (noes == met && met != 0) {
          // the number of buckets that are not all required, equals the number of buckets where the requirement has been met.
-         alert(" All requirements have been selected. Ready for forecast.");
+         alert("Ready For Forecast");
 
          var OvrlDashphpURL = 'OvrlDash.php';
          $.ajax({
              type: 'POST',
+             async: false,
              url: OvrlDashphpURL,
              dataType: 'json',
              data: {
-                 action: 'GenerateForecast'
+                 action: 'TakenAndRemaining'
              },
              success: function(data) {
 
-                 var GPAGoal = $("#data p:first").text();
+                 GPAGoal = $("#data p:first").text();
 
-                 var creditsTaken = data[0][0];
-                 var creditsLeft = data[0][1];
+                 creditsTaken = parseInt(data[0][0]);
+                 creditsLeft = parseInt(data[0][1]);
 
-                 var GPANeeded = GPAGoal * (0 + 1) + (GPAGoal - gpa) * (creditsTaken / creditsLeft);
-                 var GPANeededFormatted = GPANeeded.toFixed(2);
-                
-                    if (GPANeeded > 4){
-                        alert("The desired GPA currently unattainable with the amount of remaining credits.\nSeek guidance from an advisor for further assistance.");
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\n\n");
-                    }
-
-					if (GPANeeded < 0){
-					    alert("Your goal GPA has been met! Congratulations!");
-						alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-                    }
-
-                    if (GPANeeded <= 4 && GPANeeded > 3.7){
-                        var gradeneeded = "A";
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-                    }
-
-                    if (GPANeeded <= 3.67 && GPANeeded > 3.33){
-                        var gradeneeded = "A-";
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-					}
-
-                    if (GPANeeded <= 3.33 && GPANeeded > 3.0){
-                        var gradeneeded = "B+";
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");0
-					}
-
-                    if (GPANeeded <= 3.0 && GPANeeded > 2.67){
-                        var gradeneeded = "B";
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-					}
-
-                    if (GPANeeded <= 2.67 && GPANeeded > 2.33){
-                        var gradeneeded = "B-";
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-					}
-
-                    if (GPANeeded <= 2.30 && GPANeeded > 2.0){
-                        var gradeneeded = "C+";
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-					}
-
-                    if (GPANeeded <= 2.0 && GPANeeded > 0){
-                        var gradeneeded = "C";
-                        alert("FORECAST REPORT \n\nCurrent GPA: " + gpa + "\nDesired GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nAVG GPA needed to maintain: " + GPANeededFormatted + "\nThis means that if you earn a " + gradeneeded + " in all of your remaining classes, your goal will be met!\n");
-                    }
+                 GPANeeded = GPAGoal * (0 + 1) + (GPAGoal - gpa) * (creditsTaken / creditsLeft);
+                 GPANeededFormatted = GPANeeded.toFixed(2);
              },
              error: function(XMLHttpRequest, textStatus, errorThrown) {
                  alert(errorThrown);
              }
-
          });
+
+         $.ajax({
+             type: 'POST',
+             async: false,
+             url: OvrlDashphpURL,
+             dataType: 'json',
+             data: {
+                 action: 'GradesAndCredits'
+             },
+             success: function(data2) {
+                 var gradeChar;
+                 var gradeValue;
+                 var courseCredits;
+                 totalGradePoints = 0;
+                 allCourseCredits = 0;
+
+                 for(var x = 0; x < data2.length; x++) {
+                     gradeChar = data2[x][0];
+                     courseCredits = parseInt(data2[x][1]);
+
+                     switch (gradeChar) {
+                         case 'A':
+                             gradeValue = 4.00;
+                             break;
+                         case 'A-':
+                             gradeValue = 3.67;
+                             break;
+                         case 'B+':
+                             gradeValue = 3.33;
+                             break;
+                         case 'B':
+                             gradeValue = 3.00;
+                             break;
+                         case 'B-':
+                             gradeValue = 2.67;
+                             break;
+                         case 'C+':
+                             gradeValue = 2.33;
+                             break;
+                         case 'C':
+                             gradeValue = 2.00;
+                             break;
+                         case 'C-':
+                             gradeValue = 1.67;
+                             break;
+                         case 'D+':
+                             gradeValue = 1.33;
+                             break;
+                         case 'D':
+                             gradeValue = 1.00;
+                             break;
+                         case 'D-':
+                             gradeValue = 0.67;
+                             break;
+                         case 'F':
+                             gradeValue = 0.00;
+                             break;
+                         case 'F0*':
+                             gradeValue = 0.00;
+                             break;
+                         case 'P':
+                             gradeValue = 3.00;
+                         default:
+                             //error: char is not a Grade Value
+                             break;
+                     }
+                     totalGradePoints += (gradeValue * courseCredits);
+                     allCourseCredits += courseCredits;
+                 }
+                 //alert("Grade Points: " + totalGradePoints);
+
+             },
+             error: function(XMLHttpRequest, textStatus, errorThrown) {
+                 alert(errorThrown);
+             }
+         });
+
      } else {
-         alert("Classes have not been selected for forecast to be generated.");
+         alert("Classes Have NOT Been Selected for Forecast to be Generated.");
      }
+     //calculate maxGoalGpa
+     var maxGoalGPA = ((totalGradePoints +(creditsLeft * 4)) / (allCourseCredits + creditsLeft)).toFixed(2);
+     accurateGPA = (totalGradePoints / allCourseCredits);
+     var accurateGPAFormatted = (totalGradePoints / allCourseCredits).toFixed(2);
+     
+     if(GPAGoal > maxGoalGPA) {
+         alert("Goal GPA of " + GPAGoal + " cannot be obtained by the time of graduation.\nPlease speak to your adviser for further assistance.");
+     }
+     else {
+         //alert("Goal GPA of " + GPAGoal + " is attainable! Yay! You still have hope!");
 
+         var courseName = new Array();
+         var courseID = new Array();
+         var creditsIP = new Array();
+         var relevance = new Array();
+         var weight = new Array();
+         creditsInProgress = 0;
 
+         $.ajax({
+             type: 'POST',
+             async: false,
+             url: OvrlDashphpURL,
+             dataType: 'json',
+             data: {
+                 action: 'CurrentCourses'
+             },
+             success: function (data21) {
+                 for (var x = 0; x < data21.length; x++) {
+                     courseID.push(data21[x][0]);
+                     courseName.push(data21[x][1]);
+                     creditsIP.push(data21[x][2]);
+                     weight.push(data21[x][3]);
+                     relevance.push(data21[x][4]);
+                     
+                     creditsInProgress += data21[x][2];
+                 }
+             },
+             error: function (XMLHttpRequest, textStatus, errorThrown) {
+                 alert(errorThrown);
+             }
+         });
+
+         //breakdown GoalGPA over remaining semesters assuming student takes 4 classes per semester
+         var GPARemainingForGoal = GPAGoal - accurateGPA;
+         var semestersRemaining = Math.ceil(creditsLeft / 12);
+         var semesterGoal = accurateGPA + (GPARemainingForGoal / semestersRemaining);
+         var semesterGradePoints = (GPAGoal * (allCourseCredits + creditsInProgress)) - totalGradePoints;
+
+        //calculate estimatedSemesterGradePoints based on weight and relevance
+         var relevanceUpdated = false;
+         for(var i = 0; i < weight.length; i++) {
+             if(relevance[i] == 0 || weight[i] == 0) { //check to see if either relevance or weight = 0
+
+                 if(relevance[i] == 0 && weight[i] == 0) { //if both = 0, prompt for both values
+                     relevance[i] = prompt("Enter Relevance (0-3) for " + courseName[i] + " - " + courseID[i], "0 = No Relevance, 3 = Completely Relevant");
+                     weight[i] = prompt("Enter Weight (1-3) for " + courseName[i] + " - " + courseID[i], "1 = Easy, 3 = Hard");
+                     $.ajax({
+                         type: 'POST',
+                         async: false,
+                         url: OvrlDashphpURL,
+                         dataType: 'json',
+                         data: {
+                             action: 'ModifyWeightAndRelevance',
+                             courseID: courseID[i],
+                             modifiedRelevance: relevance[i],
+                             modifiedWeight: weight[i]
+                         },
+                         success: function (data) {
+
+                         },
+                         error: function (XMLHttpRequest, textStatus, errorThrown) {
+                             alert(errorThrown);
+                         }
+                     });
+                 }
+                 else if(weight[i] == 0) { //if only weight = 0, prompt for weight
+                     weight[i] = prompt("Enter Weight for " + courseName[i] + " - " + courseID[i], "1 = Easy, 3 = Hard");
+                     $.ajax({
+                         type: 'POST',
+                         async: false,
+                         url: OvrlDashphpURL,
+                         dataType: 'json',
+                         data: {
+                             action: 'ModifyWeightAndRelevance',
+                             courseID: courseID[i],
+                             modifiedRelevance: relevance[i],
+                             modifiedWeight: weight[i]
+                         },
+                         success: function (data) {
+
+                         },
+                         error: function (XMLHttpRequest, textStatus, errorThrown) {
+                             alert(errorThrown);
+                         }
+                     });
+                 }
+             }
+         }
+
+         var relevanceMax = new Array();
+         var lowestRelevance;
+         var arrNum;
+         var estimatedGradePoints;
+
+         function estimatedSemesterGradePoints() {
+             //alert("Inside the estimatedSemesterGradePoints() function!");
+             estimatedGradePoints = 0;
+
+             for (var i = 0; i < relevance.length; i++) {
+                 if (relevance[i] == 3.5) {
+                     relevanceMax[i] = 1; //1 means at MAX RELEVANCE
+                 }
+                 else {
+                     relevanceMax[i] = 0; //0 means NOT at MAX RELEVANCE
+                 }
+             }
+
+             for (var z = 0; z < relevance.length; z++) {
+                 var gradeValue = 0;
+
+                 switch (relevance[z]) {
+                     case 3.5:
+                         gradeValue = 4.00;
+                         break;
+                     case 3:
+                         gradeValue = 3.67;
+                         break;
+                     case 2.5:
+                         gradeValue = 3.33;
+                         break;
+                     case 2:
+                         gradeValue = 3.00;
+                         break;
+                     case 1.5:
+                         gradeValue = 2.67;
+                         break;
+                     case 1:
+                         gradeValue = 2.33;
+                         break;
+                     case 0:
+                         gradeValue = 2.00;
+                         break;
+                     default:
+                         //error: relevance value is not a valid number
+                         break;
+                 }
+
+                 estimatedGradePoints += (creditsIP[z] * gradeValue);
+             }
+
+             return estimatedGradePoints;
+         }
+
+         do {
+             var EGP = estimatedSemesterGradePoints();
+             var successful = false;
+
+             //alert(EGP + " vs " + semesterGradePoints);
+
+             if(EGP < semesterGradePoints) { //in theory, shouldn't enter if EGP is greater than SGP
+                 //alert("Success? " + successful);
+
+                     var maxedOut = true; //each class has reached a max grade of 4.0
+                     lowestRelevance = 0;
+                     arrNum = 0;
+
+                     for(var j = 0; j < relevanceMax.length; j++) { //check to see if courses aren't maxedOut yet
+                         if (relevanceMax[j] == 0) { //there exists a class that is not maxedOut
+                             lowestRelevance = relevance[j];
+                             arrNum = j;
+                             maxedOut = false;
+                             //alert(arrNum + "-array is not maxedOut" + "\nlowestRelevance: " + lowestRelevance + "\narrNum: " + arrNum);
+                             break;
+                         }
+                     }
+
+                     if(maxedOut) { //all courses have been maxedOut, so break the do-while
+                         //alert("All classes are maxedOut. Time to break on out of here.");
+                         break;
+                     }
+
+                     for(var x = arrNum; x < relevance.length; x++) { //loop starts at first non-maxedOut value
+                         if(relevanceMax[x] != 1) {
+                             if(lowestRelevance > relevance[x]) {
+                                 lowestRelevance = relevance[x];
+                                 arrNum = x;
+                                 //alert("New lowestRelevance of " + relevance[x] + " at relevance-" + arrNum);
+                             }
+                         }
+                     }
+
+                     //increase relevance value
+                     if(relevance[arrNum] == 0) {
+                         relevance[arrNum] = 1;
+                         relevanceUpdated = true;
+                     }
+                     else {
+                         //alert("Time to update!")
+                         relevance[arrNum] += 0.5;
+                         relevanceUpdated = true;
+                         if(relevance[arrNum] == 3.5) {
+                             relevanceMax[arrNum] = 1;
+                         }
+                     }
+             }
+             else {
+                 successful = true;
+             }
+         } while(!successful);
+            //alert("IT WOOOOOOOOOORKS!!\n" + relevance[0] + " - " + relevance[1] + " - " + relevance[2] + " - " + relevance[3]);
+
+         /*
+         //modify relevance in DB if relevanceUpdated
+         if(relevanceUpdated) {
+             for (var k = 0; k < courseID.length; k++) {
+                 $.ajax({
+                     type: 'POST',
+                     async: false,
+                     url: OvrlDashphpURL,
+                     dataType: 'json',
+                     data: {
+                         action: 'ModifyWeightAndRelevance',
+                         courseID: courseID[k],
+                         modifiedRelevance: relevance[k],
+                         modifiedWeight: weight[k]
+                     },
+                     success: function (data) {
+
+                     },
+                     error: function (XMLHttpRequest, textStatus, errorThrown) {
+                         alert(errorThrown);
+                     }
+                 });
+             }
+         }
+         */
+
+         //calculate secureGPAPath
+         var secureGPAPath = new Array();
+         for(var i = 0; i < relevance.length; i++) {
+             if(relevance[i] <= 2.5) {
+                 secureGPAPath[i] = relevance[i] + 1;
+             }
+             else if(relevance[i] == 3) {
+                 secureGPAPath[i] = relevance[i] + 0.5;
+             }
+             else {
+                 secureGPAPath[i] = relevance[i];
+             }
+         }
+         //alert("Secure GPA Path: " + secureGPAPath[0] + " - " + secureGPAPath[1] + " - " + secureGPAPath[2] + " - " + secureGPAPath[3]);
+
+         function valueToChar(value) {
+             var letter;
+             switch (value) {
+                case 3.5:
+                    letter = 'A';
+                    break;
+                case 3:
+                    letter = 'A-';
+                    break;
+                case 2.5:
+                    letter = 'B+';
+                    break;
+                case 2:
+                    letter = 'B';
+                    break;
+                case 1.5:
+                    letter = 'B-';
+                    break;
+                case 1:
+                    letter = 'C+';
+                    break;
+                case 0:
+                    letter = 'C';
+                    break;
+                default:
+                    //error: relevance value is not a valid number
+                    break;
+             }
+             return letter;
+         }
+
+         //calculate minimumStudyTime from (relevance * weight)
+         var minimumStudyTime = new Array();
+         for(var j = 0; j < relevance.length; j++) {
+             minimumStudyTime[j] = Math.floor(relevance[j]) * weight[j];
+         }
+         //alert("Minimum Study Time: " + minimumStudyTime[0] + " - " + minimumStudyTime[1] + " - " + minimumStudyTime[2] + " - " + minimumStudyTime[3]);
+
+         alert("Semester GPA Forecast\n\nCurrent GPA: " + accurateGPA.toFixed(2) + "\nSemester Goal GPA: " + semesterGoal.toFixed(2) + "\nDesired Graduation GPA: " + GPAGoal + "\nCredits Remaining: " + creditsLeft + "\n\nIn order to reach a Graduation Goal GPA of " + GPAGoal + ", you require a minimum Semester GPA of " + semesterGoal.toFixed(2) + ". According to the weight and relevance you provided, the following forecast was generated:\n\nCourse\t\tWeight\tRelevance\t\tMin. Grade Required\tSecure GPA Path\tEst. Study Time\n" + courseID[0] + "\t\t" + weight[0] + "\t\t\t" + relevance[0] + "\t\t\t" + valueToChar(relevance[0]) + "\t\t\t" + valueToChar(secureGPAPath[0]) + "\t\t\t\t" + minimumStudyTime[0] + "\n" + courseID[1] + "\t\t" + weight[1] + "\t\t\t" + relevance[1] + "\t\t\t" + valueToChar(relevance[1]) + "\t\t\t" + valueToChar(secureGPAPath[1]) + "\t\t\t\t" + minimumStudyTime[1] + "\n" + courseID[2] + "\t\t" + weight[2] + "\t\t\t" + relevance[2] + "\t\t\t" + valueToChar(relevance[2]) + "\t\t\t" + valueToChar(secureGPAPath[2]) + "\t\t\t\t" + minimumStudyTime[2] + "\n" + courseID[3] + "\t\t" + weight[3] + "\t\t\t" + relevance[3] + "\t\t\t" + valueToChar(relevance[3]) + "\t\t\t" + valueToChar(secureGPAPath[3]) + "\t\t\t\t" + minimumStudyTime[3]);
+     }
  }
-
 
  function RequirementMet(bucket) {
      var OvrlDashphpURL = 'OvrlDash.php';
@@ -626,22 +958,14 @@
 
          },
          success: function(data) {
-            
+
              if (data.success) {
                  // children buckets found
-
-
                  GetBucketReqs(bucket);
-
              } else {
                  // no child buckets found
-
                  GetCourseReqs(bucket);
-
-
              }
-
-
          },
          error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert("course doesnt exist");
@@ -650,9 +974,6 @@
      });
 
  }
-
-
-
 
  function GetCourseReqs(bucket) {
      var OvrlDashphpURL = 'OvrlDash.php';
@@ -677,16 +998,10 @@
                      var elem = $("td:contains('" + change + "')");
                   
                      elem.append('<p style = "font-size:9px;color:blue;" class = "appendReq' + bucket + '"> Requirement met</p>');
-                     
-                    
                  }
-
              } else {
-                
                  $("td:contains('" + change + "')").children().remove();
-               
              }
-
          },
          error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert(errorThrown);
@@ -710,28 +1025,17 @@
              var changes = JSON.stringify(bucket);
             
              if (data[0][0] >= data[0][1]) {
-                
-
                  if ($("td:contains('" + change + "')").text().indexOf("Requirement") == -1) {
-
                      var elem = $("td:contains('" + change + "')");
-                    
                      elem.append('<p style = "font-size:9px;color:blue;" class = "appendReq' + bucket + '"> Requirement met</p>');
-                     
-                   
                  }
-
-             } else {
-                 
-             }
-
+             } else {}
          },
          error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert(errorThrown);
          }
      });
  }
-
 
  function sto_openDetailsRow4(nTr) {
      childTable2.fnOpen(nTr, sto_formatStoreManagerDetails2(childTable2,
@@ -1063,11 +1367,7 @@
      });
  }
 
-
- function start() {
-
-
-
+ function start2() {
      var OvrlDashphpURL = 'OvrlDash.php';
      $.ajax({
          type: 'POST',
@@ -1077,17 +1377,14 @@
              action: 'editStudent'
          },
          success: function(data) {
-
-  var sPath = window.location.pathname;
-var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
-if(sPage == "student_roster.html"){
+             var sPath = window.location.pathname;
+             var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
+             if(sPage == "student_roster.html"){
    				if (data.message == "false"){
 						alert(data.why);
 						 $(location).attr('href', 'OvrlDash.html');
-}
-}
-
-
+                }
+             }
              studRoster = $('#studRost').dataTable({
                  "aaData": data,
                  "aaSorting": [
@@ -1121,9 +1418,6 @@ if(sPage == "student_roster.html"){
 
      GetGPA();
 
-
-
-
      var OvrlDashphpURL = 'OvrlDash.php';
      $.ajax({
          type: 'POST',
@@ -1133,8 +1427,6 @@ if(sPage == "student_roster.html"){
              action: 'getMajorBuckets',
          },
          success: function(data) {
-
-
              courseTakenBuckets = $('#parentTableTaken').dataTable({
                  "aaData": data,
                  "aaSorting": [
@@ -1199,17 +1491,10 @@ if(sPage == "student_roster.html"){
                                  //alert ("children found");
 
                                  openChildBucketsTaken(nTr, courseTakenBuckets);
-
-
                              } else {
                                  // alert ("no child buckets");
-
-
                                  openBucket(nTr, courseTakenBuckets);
-
                              }
-
-
                          },
                          error: function(XMLHttpRequest, textStatus, errorThrown) {
                              alert("course doesnt exist");
@@ -1303,8 +1588,6 @@ if(sPage == "student_roster.html"){
                                              openBucket(nTr, childTableDTTaken);
 
                                          }
-
-
                                      },
                                      error: function(XMLHttpRequest, textStatus, errorThrown) {
                                          alert("course doesnt exist");
@@ -1314,19 +1597,13 @@ if(sPage == "student_roster.html"){
 
                              }
                          }
-
-
                      },
                      error: function(XMLHttpRequest, textStatus, errorThrown) {
                          alert(errorThrown);
                      }
-
                  });
-
-
              }
-
-
+             
              function openBucket(nTr, oTable) {
 
                  oTable.fnOpen(nTr, sto_formatDataTable(oTable,
@@ -1427,28 +1704,17 @@ if(sPage == "student_roster.html"){
                              });
 
                          }
-
-
-
-
                      },
                      error: function(XMLHttpRequest, textStatus, errorThrown) {
                          alert(errorThrown);
                      }
-
                  });
-
-               
-
              }
-
          },
          error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert(errorThrown);
          }
-
      });
-
 
      $.ajax({
          type: 'POST',
@@ -1458,7 +1724,6 @@ if(sPage == "student_roster.html"){
              action: 'getMajorBucketsNeeded',
          },
          success: function(data) {
-
 
              courseNeededBuckets = $('#parentTable').dataTable({
                  "aaData": data,
@@ -1490,9 +1755,8 @@ if(sPage == "student_roster.html"){
              $('#parentTable tbody tr td').on('click',
                  clickBucket);
 
-             $("#forecast").click(function() {
-
-
+             $("#generateForecast").click(function() {
+                 
                  for (var i = 0; i < data.length; i++) {
                      if (data[i][2] == "NO") {
                          noes++;
@@ -1504,13 +1768,8 @@ if(sPage == "student_roster.html"){
                      GenerateForecast(data);
 
                  }, 1000);
-
-
-
-
+                 
              });
-
-
 
              function clickBucket() {
                  var nTr = this.parentNode;
@@ -1555,8 +1814,6 @@ if(sPage == "student_roster.html"){
                                      openBucket2(nTr, courseNeededBuckets);
                                  }
                              }
-
-
                          },
                          error: function(XMLHttpRequest, textStatus, errorThrown) {
                              alert("course doesnt exist");
@@ -1607,11 +1864,7 @@ if(sPage == "student_roster.html"){
                          $('#childBucketsDT' + bucketHTMLID + ' tbody tr td').off();
                          $('#childBucketsDT' + bucketHTMLID + ' tbody tr td').on('click', clickBucket2);
 
-
                          RequirementMet(bucket);
-
-
-
 
                          function clickBucket2() {
                              var nTr = this.parentNode;
@@ -1647,8 +1900,6 @@ if(sPage == "student_roster.html"){
                                              // alert ("children found");
 
                                              openChildBuckets(nTr, childTableDTNeeded2);
-
-
                                          } else {
                                              // alert ("no child buckets");
                                              var req = aData[2];
@@ -1669,20 +1920,12 @@ if(sPage == "student_roster.html"){
 
                              }
                          }
-
-
                      },
                      error: function(XMLHttpRequest, textStatus, errorThrown) {
                          alert(errorThrown);
                      }
-
                  });
-
-
              }
-
-
-
 
              function openBucket(nTr, oTable) {
                  var aData = oTable.fnGetData(nTr);
@@ -1774,23 +2017,13 @@ if(sPage == "student_roster.html"){
                                  addArrow(childTableDTNeeded, nTr);
                              });
                          }
-
-
-
-
+                         
                      },
                      error: function(XMLHttpRequest, textStatus, errorThrown) {
                          alert(errorThrown);
                      }
 
                  });
-
-           
-                
-                
-              
-
-
              }
 
              function openBucket2(nTr, oTable) {
@@ -1820,9 +2053,7 @@ if(sPage == "student_roster.html"){
                  });
 
                  function RequirementMet(bucket) {
-
-
-
+                     
                      var OvrlDashphpURL = 'OvrlDash.php';
                      $.ajax({
                          type: 'POST',
@@ -1831,25 +2062,15 @@ if(sPage == "student_roster.html"){
                          data: {
                              action: 'findChildBuckets',
                              bucket: bucket
-
                          },
                          success: function(data) {
                              //alert(JSON.stringify(data)+"data");
                              if (data.success) {
                                  alert("children found");
-
-
-
-
                              } else {
                                  // alert ("no child buckets");
-
                                  GetCourseReqs(bucket);
-
-
                              }
-
-
                          },
                          error: function(XMLHttpRequest, textStatus, errorThrown) {
                              alert("course doesnt exist");
@@ -1860,8 +2081,7 @@ if(sPage == "student_roster.html"){
                  }
 
                  RequirementMet(bucket);
-
-
+                 
                  function GetCourseReqs(bucket) {
                      $.ajax({
                          type: 'POST',
@@ -1885,7 +2105,6 @@ if(sPage == "student_roster.html"){
                                      append = true;
                                      //alert("requirement met Req: " + data[0][0] + " selectd: " + data[0][1]   );
                                  }
-
                              } else {
                                  //alert("requirement not met");
                                  $("td:contains('" + change + "')").children().remove();
@@ -1893,16 +2112,12 @@ if(sPage == "student_roster.html"){
                                  append = false;
                                  //alert("requirement not met");
                              }
-
                          },
                          error: function(XMLHttpRequest, textStatus, errorThrown) {
                              alert(errorThrown);
                          }
                      });
                  }
-
-
-
 
                  function AddExtraCourse(courseID, bucket) {
                      $.ajax({
@@ -1917,13 +2132,9 @@ if(sPage == "student_roster.html"){
                          success: function(data) {
                              if (data.success) {
                                  alert("course added");
-
-
                              } else {
                                  alert("course doesnt exist ifdata");
                              }
-
-
                          },
                          error: function(XMLHttpRequest, textStatus, errorThrown) {
                              alert("course doesnt exist");
@@ -1932,9 +2143,7 @@ if(sPage == "student_roster.html"){
                      });
                  }
 
-
                  var childTableDTNeededCourses2;
-
                  $.ajax({
                      type: 'POST',
                      url: OvrlDashphpURL,
@@ -1998,7 +2207,6 @@ if(sPage == "student_roster.html"){
                          }
 
                          function ChangeCheckboxAjax(state, courseID) {
-
 
                              var OvrlDashphpURL = 'OvrlDash.php';
                              $.ajax({
@@ -2070,25 +2278,13 @@ if(sPage == "student_roster.html"){
                                  addArrow(childTableDTNeededCourses2, nTr);
                              });
                          }
-
-
-
-
                      },
                      error: function(XMLHttpRequest, textStatus, errorThrown) {
                          alert(errorThrown);
                      }
 
                  });
-
-
-
-                
-
-
-
              }
-
          },
          error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert(errorThrown);
@@ -2186,9 +2382,6 @@ if(sPage == "student_roster.html"){
          });
      }
 
-
-
-
      $.ajax({
          type: 'POST',
          url: OvrlDashphpURL,
@@ -2267,7 +2460,6 @@ if(sPage == "student_roster.html"){
      }, 1000);
 
      function getgraph() {
-
          $.ajax({
              type: 'POST',
              url: OvrlDashphpURL,
@@ -2319,20 +2511,11 @@ if(sPage == "student_roster.html"){
 
                      }
                  });
-
-
-
-
              },
              error: function(XMLHttpRequest, textStatus, errorThrown) {
-                 alert(errorThrown);
+                 alert(errorThrown);findChildBuckets
              }
-
          });
-
-
-
-
      }
      $.ajax({
          type: 'POST',
@@ -2342,12 +2525,8 @@ if(sPage == "student_roster.html"){
              action: 'getCurrentProgram'
          },
          success: function(data) {
-
-
-
              $('#studentMajData p').append(data[0][0]);
              $('#studentMajData p').replaceWith('<p>' + data[0][0] + '</p>');
-
          },
          error: function(XMLHttpRequest, textStatus, errorThrown) {
              alert(errorThrown);
