@@ -32,7 +32,7 @@ print ("!!!!")
 #Gets courses already taken.
 courses = re.findall(r"(Course History)(.*)",allText)
 
-courseBreakdown = re.findall(r"(FALL|SPR|SUM)\s(\d\d\d\d)([A-Z][A-Z][A-Z]\d\d\d\d)(.*?)(A|A-|B|B[+-]|C|C[+-]|D|D[+-]|F|P|DR|TR)(\d+[.]\d\d)(TR|EN)", str(courses[0]))
+courseBreakdown = re.findall(r"(FALL|SPR|SUM)\s(\d\d\d\d)([A-Z][A-Z][A-Z]\d\d\d\d)(.*?)(A|A-|B|B[+-]|C|C[+-]|D|D[+-]|F|P|DR|CW)(\d+[.]\d\d)(TR|EN|OT)", str(courses[0]))
 for item in courseBreakdown:
 	semester = item[0]
 	if semester == "FALL":
@@ -53,8 +53,7 @@ for item in courseBreakdown:
 	credits = item[5]
 	ctype = item[6]
 
-	if ctype == 'EN':
-		print semester + "$$&&"+ year + "$$&&" + course + "$$&&" +courseDescription + "$$&&" + grade + "$$&&" + credits 
+	print semester + "$$&&"+ year + "$$&&" + course + "$$&&" +courseDescription + "$$&&" + grade + "$$&&" + credits + "$$&&" + ctype
 
 #Get classes in Progress
 inProgress = re.findall(r"(FALL|SPR|SUM)\s(\d\d\d\d)([A-Z][A-Z][A-Z]\d\d\d\d)(.{1,20})(\d+[.]\d\d)IP", str(courses[0]))
@@ -76,16 +75,20 @@ for item in inProgress:
 			
 	grade = "IP"
 	credits = item[4]
-	print semester + "$$&&"+ year + "$$&&" + course + "$$&&" +courseDescription + "$$&&" + grade + "$$&&" + credits
+	print semester + "$$&&"+ year + "$$&&" + course + "$$&&" +courseDescription + "$$&&" + grade + "$$&&" + credits + "$$&&" + 'IP'
 
 print ("!!!!")
 
-#get needed courses
-neededCourses = re.findall(r"Select From:\s\s\s\s\s(.*?)\s\s", allText)
-for c in range (0, len(neededCourses)):
-	course = re.findall(r"([A-Z][A-Z][A-Z])\s(\d\d\d\d)",neededCourses[c])
-	for d in range (0, len(course)):
-		print course[d][0] + course[d][1]
+ucc = re.findall(r"(Satisfied|In Progress) UNDERGRADUATE REQUIREMENTS", allText)
+if ucc[0] == "Satisfied":
+   print "true"
+else:
+   print "false"
+
+
+
+   
+   
 
 
 

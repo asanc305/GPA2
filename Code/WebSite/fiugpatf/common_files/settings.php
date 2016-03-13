@@ -42,7 +42,7 @@ if($action == "prepareTable") {
 		array_push($output, array("Export Data", '<button type="button" id="ExportButton">Export Data</button>'));
 		array_push($output, array("Import Data", '<input type="file" id="ImportFile">'));
 		array_push($output, array("Delete Data", '<button type="button" id="DeleteButton">Delete Data</button>'));
-		array_push($output, array("Import GPA Audit (PDF)", '<form id="PDFimport" action="settings.php" enctype="multipart/form-data" method="post"><input type="file" name="file" id="Whatif"><input type="hidden" name="action" value="importWhatif"></form>'));
+		array_push($output, array("Import GPA Audit (PDF)", '<form id="PDFimport" action="router.php" enctype="multipart/form-data" method="post"><input type="file" name="file" id="Whatif"><input type="hidden" name="action" value="importAudit"></form>'));
 		if($admin == 1)
 		{
 			array_push($output, array("Import Requirments", '<form id="Reqimport" action="settings.php" enctype="multipart/form-data" method="post"><input type="file" name="file" id="ImportReqirments"><input type="hidden" name="action" value="importReq"></form>'));
