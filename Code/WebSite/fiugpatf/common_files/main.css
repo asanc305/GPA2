@@ -211,15 +211,21 @@ ul ol {
 	width: 900px;
 	height: 400px;
 	margin: auto;
-	background-color: white;
+	background: #ffffff; /* Old browsers */
+	background: -moz-linear-gradient(top, #ffffff 0%, #ffffff 25%, #f7e288 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, #ffffff 0%,#ffffff 25%,#f7e288 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, #ffffff 0%,#ffffff 25%,#f7e288 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f7e288',GradientType=0 ); /* IE6-9 */
 }
 
 #gtitle {
+	font-family: "Times New Roman", Georgia, Serif;
+	padding-top: 25px;
 	display: table;
 	margin: auto;
-	padding-left: 200px;
+	text-align: center;
 	width: 900px;
-	background-color: white;
+	background-color: #ffffff;
 }
 
 #empty {
@@ -229,3 +235,33 @@ ul ol {
     background-position: center center;
 	background-attachment: fixed;
 }
+
+/* legend on Semester Dashboard */
+#graph_legend {
+	text-align: center;
+	width: 900px;
+	margin: auto;
+	margin-bottom: 5em;
+	background-color: #f7e288;
+}
+.legend {
+	list-style: none;
+}
+.legend li {
+	display:inline-block;
+	margin-right: 10px;
+}
+.legend span {
+	border: 1px solid #ccc;
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin: 2px;
+}
+/* your colors */
+.legend .course0 { background-color: #000080; }
+.legend .course1 { background-color: #FFD700; }
+.legend .course2 { background-color: #333333; }
+.legend .course3 { background-color: #0f6b2e; }
+.legend .course4 { background-color: #ff3300; }
+.legend .course5 { background-color: #7d00b3; }

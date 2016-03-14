@@ -7,6 +7,7 @@ var currCourse;
 var breakdown = null;
 var $dialog;
 var breakRowNum;
+var router = 'semesterDashboardRouter.php';
 
 function start() {
     $('#current_course').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="ajax1"></table>');
@@ -15,9 +16,9 @@ function start() {
     $.ajax({
         type: 'POST',
         async: false,
-        url: 'getCurrCourse.php',
+        url: router,
         data: {
-            action: 'CurrentAssessments'
+            action: 'currentAssessments'
         },
         dataType: 'json',
         success: function (data) {
@@ -50,24 +51,47 @@ function start() {
                     }
                 }
             }
-
         }
 
     });
 
     if(!noGrades) {
-        $('#current_course').append('<h1 id="gtitle">Grade Trends for All Courses</h1>');
+        $('#current_course').append('<br><h2 id="gtitle">Grade Trends for All Courses</h2>');
         $('#current_course').append('<div id="placeholder"></div>');
         //$('#current_course').append('<button type="button" id="ExportButton">Export Data</button>');
 
-        $('#graph_courses').append('<h1 id="gtitle">Grade Trends for All Courses</h1>');
-        $('#graph_courses').append('<div id="placeholder"></div><div id="chartLegend"></div>');
+        var courseLegend = new Array();
         $.ajax({
             type: 'POST',
             async: false,
-            url: 'getCurrCourse.php',
+            url: router,
             data: {
-                action: 'GetGraphData'
+                action: 'courseLegend'
+            },
+            dataType: 'json',
+            success: function (data) {
+                for (var x = 0; x < data.length; x++) {
+                    courseLegend.push(data[x]);
+                }
+
+                var legend = "<div id='graph_legend'><br><ul class='legend'>";
+                for(var q = 0; q < courseLegend.length; q++) {
+                    legend += "<li><span class='course" + q + "'></span>" + courseLegend[q] + "</li>";
+                }
+                legend += "</ul><br></div>";
+
+                $('#current_course').append(legend);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            async: false,
+            url: router,
+            data: {
+                action: 'getGraphData'
             },
             dataType: 'json',
             success: function (data) {
@@ -75,8 +99,8 @@ function start() {
                 $.plot($('#placeholder'), data.slice(0, data.length), {
                     xaxis: {
                         axisLabel: "Date",
-                        //ticks: data[data.length - 1]
-                        ticks: 5
+                        mode: "time",
+                        timeformat: "%m-%d"
                     },
                     yaxis: {
                         axisLabel: "Running Grade",
@@ -88,10 +112,7 @@ function start() {
                             radius: 3
                         }
                     },
-                    legend: {
-                        show: true,
-                        container: $("#chartLegend")
-                    }
+                    colors: ["#000080", "#FFD700", "#333333", "#0f6b2e", "#ff3300", "#7d00b3"]
                 });
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -385,14 +406,30 @@ function CheckSemesterForecast() {
     $.ajax({
         type: 'POST',
         async: false,
-        url: currentURL,
+        url: router,
         dataType: 'json',
         data: {
-            action: 'TakenAndRemaining'
+            action: 'GPAGoal'
         },
         success: function(data) {
 
-            GPAGoal = $("#data p:first").text();
+            GPAGoal = data[0][0];
+
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
+    });
+
+    $.ajax({
+        type: 'POST',
+        async: false,
+        url: router,
+        dataType: 'json',
+        data: {
+            action: 'takenAndRemaining'
+        },
+        success: function(data) {
 
             creditsTaken = parseInt(data[0][0]);
             creditsLeft = parseInt(data[0][1]);
@@ -411,14 +448,12 @@ function CheckSemesterForecast() {
         $.ajax({
             type: 'POST',
             async: false,
-            url: currentURL,
+            url: router,
             dataType: 'json',
             data: {
-                action: 'TakenAndRemaining'
+                action: 'takenAndRemaining'
             },
             success: function(data) {
-
-                GPAGoal = $("#data p:first").text();
 
                 creditsTaken = parseInt(data[0][0]);
                 creditsLeft = parseInt(data[0][1]);
@@ -431,10 +466,10 @@ function CheckSemesterForecast() {
         $.ajax({
             type: 'POST',
             async: false,
-            url: currentURL,
+            url: router,
             dataType: 'json',
             data: {
-                action: 'GradesAndCredits'
+                action: 'gradesAndCredits'
             },
             success: function(data2) {
                 var gradeChar;
@@ -521,10 +556,10 @@ function CheckSemesterForecast() {
             $.ajax({
                 type: 'POST',
                 async: false,
-                url: currentURL,
+                url: router,
                 dataType: 'json',
                 data: {
-                    action: 'CurrentCourses'
+                    action: 'currentCourses'
                 },
                 success: function (data21) {
                     for (var x = 0; x < data21.length; x++) {
@@ -551,10 +586,10 @@ function CheckSemesterForecast() {
                         $.ajax({
                             type: 'POST',
                             async: false,
-                            url: currentURL,
+                            url: router,
                             dataType: 'json',
                             data: {
-                                action: 'ModifyWeightAndRelevance',
+                                action: 'modifyWeightAndRelevance',
                                 courseID: courseID[i],
                                 modifiedRelevance: relevance[i],
                                 modifiedWeight: weight[i]
@@ -572,10 +607,10 @@ function CheckSemesterForecast() {
                         $.ajax({
                             type: 'POST',
                             async: false,
-                            url: currentURL,
+                            url: router,
                             dataType: 'json',
                             data: {
-                                action: 'ModifyWeightAndRelevance',
+                                action: 'modifyWeightAndRelevance',
                                 courseID: courseID[i],
                                 modifiedRelevance: relevance[i],
                                 modifiedWeight: weight[i]
