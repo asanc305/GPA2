@@ -67,7 +67,7 @@ class SettingsController
          {
             $stmt = "INSERT INTO StudentMajor (userID, majorID) VALUES (?, (SELECT majorID from Major WHERE majorName = ?))";
             $params = array($this->user, $maj);
-            $dbc->select($stmt, $params);
+            $dbc->query($stmt, $params);
          }
       }
    }

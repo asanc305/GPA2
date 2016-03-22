@@ -5,7 +5,7 @@ var gradeTable;
 $(document).ready(function(){
     course = getUrlVars()["id"];
     getCourse();
-    makeTabs();
+    //makeTabs();
 });
 
 function getCourse()
@@ -228,9 +228,9 @@ function createDiv(assessment)
                             grade: grade,
                             course: course
                         },
-                        dataType: 'text',
+                        dataType: 'json',
                         success: function (data) {
-                            if (data == 'true') {
+                            if (data[0] == 'success') {
                                 currCourse.fnClose(nTr);
                                 currCourse.fnDeleteRow(nTr);
 								recreateGradeTable();
@@ -278,9 +278,9 @@ function createDiv(assessment)
                             grade: grade,
                             newGrade: newGrade
                         },
-                        dataType: 'text',
+                        dataType: 'json',
                         success: function(data) {
-                            if(data == "true")
+                            if(data[0] == "success")
                             {
                                 currCourse.fnUpdate(newGrade, row, 1);
 								recreateGradeTable();
@@ -320,9 +320,9 @@ function createDiv(assessment)
 						    assesment: assessment,
 						    grade: grade
 						},
-						dataType: 'text',
+						dataType: 'json',
 						success: function(data) {
-						    if(data == "true")
+						    if(data[0] == "success")
 						    {
 						        currCourse.dataTable().fnAddData([
 						            "Grade" + (currCourse.fnSettings().fnRecordsTotal() + 1),
@@ -383,9 +383,9 @@ function removeAssessment(assessment)
             course: course,
             assessment: assessment
         },
-        dataType: 'text',
+        dataType: 'json',
         success: function(data) {
-            if(data == "true")
+            if(data[0] == "success")
             {
                 $("#" + assessmentNoSpace).remove();
                 $("li[aria-controls = '" + assessmentNoSpace +"']").remove();
@@ -484,9 +484,9 @@ function addAssesment()
                 assesment: assessment,
                 percentage: percentage
             },
-            dataType: 'text',
+            dataType: 'json',
             success: function(data) {
-                if(data=="true")
+                if(data[0] == 'success')
                 {
                     $('#tabs ul').append('<li><a href="#' + assessmentNoSpace + '"> ' + assessment + '</a></li>');
                     createDiv(assessment);

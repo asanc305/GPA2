@@ -1,4 +1,5 @@
 <?php
+include_once'../common_files/dbconnector.php';
 $session_name = 'sec_session_id';   // Set a custom session name
 $secure = FALSE;
 // This stops JavaScript being able to access the session id.
@@ -64,7 +65,8 @@ if($_POST['action'] == 'add')
         $stmt->bind_param('ssss', $_POST['assesment'], $_POST['percentage'], $user, $_POST['course']);
         if($stmt->execute())
 		{
-			echo "true";
+            $response_array[0] = 'success';
+            echo json_encode($response_array);
 		}
 		else
 		{
@@ -99,7 +101,8 @@ if($_POST['action'] == 'addGrade')
         $stmt->bind_param('ssssss', $user, $_POST['course'], $_POST['assesment'], $_POST['grade'], $user, $_POST['course']);
         if($stmt->execute())
 		{
-			echo "true";
+            $response_array[0] = 'success';
+            echo json_encode($response_array);
 		}
 		else
 		{
@@ -163,7 +166,8 @@ if($_POST['action'] == 'removeGrade')
         $stmt->bind_param('ssss', $_POST['grade'], $_POST['assessment'], $user, $_POST['course']);
         if($stmt->execute())
 		{
-			echo "true";
+            $response_array[0] = 'success';
+            echo json_encode($response_array);
 		}
 		else
 		{
@@ -205,7 +209,8 @@ if($_POST['action'] == 'modifyGrade')
         $stmt->bind_param('sssss', $_POST['newGrade'], $_POST['grade'], $_POST['assessment'], $user, $_POST['course']);
         if($stmt->execute())
 		{
-			echo "true";
+            $response_array[0] = 'success';
+            echo json_encode($response_array);
 		}
 		else
 		{
@@ -233,7 +238,8 @@ if($_POST['action'] == 'removeBucket')
         $stmt->bind_param('sss', $_POST['assessment'], $user, $_POST['course']);
         if($stmt->execute())
 		{
-			echo "true";
+            $response_array[0] = 'success';
+            echo json_encode($response_array);
 		}
 		else
 		{
@@ -294,52 +300,58 @@ if($_POST['action'] == 'GetAllAssessments')
 
 if($_POST['action'] == 'PlotPoints') {
 	if(isset($_SESSION['userID'])) {
-		$mysqli = new mysqli("localhost","sec_user","Uzg82t=u%#bNgPJw","GPA_Tracker");
-        $user = $_SESSION['userID'];
-        $stmt = $mysqli->prepare("SELECT b.assessmentTypeID, b.percentage, a.grade, a.dateEntered
+        $userID = $_SESSION['userID'];
+        $course = $_POST['course'];
+
+		$conn = new DatabaseConnector();
+        $params = array($userID, $course);
+        $output = $conn->select("SELECT b.assessmentTypeID, b.percentage, a.grade, a.dateEntered
         FROM   Assessment as a, AssessmentType as b
         WHERE  a.studentCourseID in (SELECT studentCourseID
         	FROM StudentCourse
-        	WHERE grade = 'IP' and userID = ? and courseInfoID in (select courseInfoID 
-        		FROM CourseInfo 
+        	WHERE grade = 'IP' and userID = ? and courseInfoID in (select courseInfoID
+        		FROM CourseInfo
         		WHERE courseID = ?))
         AND
         b.assessmentTypeID = a.assessmentTypeID
-        ORDER BY dateEntered");
-        $stmt->bind_param('ss', $user, $_POST['course']);
-        $stmt->execute();
-        $stmt->bind_result($ID, $per, $grade, $date);
-        
+        ORDER BY dateEntered", $params);
+
         $x = 1;
         $dates = array();
         $points = array();
         $runningGrades = array();
         $currDate = "Empty";
         
-        while($stmt->fetch()){
-        	if($currDate == "Empty")
-        	{
-        		$currDate = $date;
-        		array_push($dates, array($x, substr($date, 5)));
-        		array_push($runningGrades, array($ID, $per, $grade));
-        	}
-        	else if($currDate == $date)
-        	{
-        		array_push($runningGrades, array($ID, $per, $grade));
-        	}
-        	else {
-        		array_push($points, array($x, gradeUpTo($runningGrades)));
-        		array_push($runningGrades, array($ID, $per, $grade));
-        		$x++;
-        		$currDate = $date;
-        		array_push($dates, array($x, substr($date, 5)));
-        	}	
+        if (count($output) > 0)
+        {
+            foreach ($output as $assesment)
+            {
+                if ($currDate == "Empty")
+                {
+                    $currDate = $assesment[3];
+                    array_push($dates, array($x, substr($assesment[3], 5)));
+                    array_push($runningGrades, array($assesment[0], $assesment[1], $assesment[2]));
+                }
+                else if ($currDate == $assesment[3])
+                {
+                    array_push($runningGrades, array($assesment[0], $assesment[1], $assesment[2]));
+                } else
+                {
+                    array_push($points, array($x, gradeUpTo($runningGrades)));
+                    array_push($runningGrades, array($assesment[0], $assesment[1], $assesment[2]));
+                    $x++;
+                    $currDate = $assesment[3];
+                    array_push($dates, array($x, substr($assesment[3], 5)));
+                }
+            }
+            array_push($runningGrades, array($assesment[0], $assesment[1], $assesment[2]));
+            array_push($points, array($x, gradeUpTo($runningGrades)));
+            array_push($points, $dates);
+
+            echo json_encode($points);
         }
-        array_push($runningGrades, array($ID, $per, $grade));
-        array_push($points, array($x, gradeUpTo($runningGrades)));
-        array_push($points, $dates);
-        
-        echo json_encode($points);
+        else
+            echo json_encode($output);
 	}
 }
 
@@ -406,4 +418,4 @@ function averageAssess($category)
         return "No Grades";
     }
 }
-?>
+
