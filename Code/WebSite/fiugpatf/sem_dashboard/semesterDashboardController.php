@@ -8,34 +8,13 @@
 
 class SemesterDashboardController
 {
-    protected $session_name = 'sec_session_id';   // Set a custom session name
-    protected $secure = false; // This stops JavaScript being able to access the session id.
-    protected $httponly = true; // Forces sessions to only use cookies.
-    protected $cookieParams;
     protected $userID;
     protected $username;
 
-    public function __construct()
+    public function __construct($userID, $username)
     {
-
-        if (ini_set('session.use_only_cookies', 1) === FALSE) {
-            header("Location: ../error.php?err=Could not initiate a safe session (ini_set)");
-            exit();
-        }
-        // Gets current cookies params.
-        $this->cookieParams = session_get_cookie_params();
-        session_set_cookie_params($this->cookieParams["lifetime"],
-            $this->cookieParams["path"],
-            $this->cookieParams["domain"],
-            $this->secure,
-            $this->httponly);
-
-        // Sets the session name to the one set above.
-        session_name($this->session_name);
-        session_start();
-
-        $this->userID = $_SESSION['userID'];
-        $this->username = $_SESSION['username'];
+        $this->userID = $userID;
+        $this->username = $username;
     }
 
     function currentAssessments() {
@@ -63,6 +42,7 @@ class SemesterDashboardController
         }
 
         echo json_encode($return);
+        return $return;
 
     }
 
@@ -120,7 +100,7 @@ class SemesterDashboardController
 
     function courseLegend() {
         $db = new DatabaseConnector();
-        $legend = [];
+        $return = [];
 
 
         $stmt = "SELECT CourseInfo.courseID, CourseInfo.courseInfoID FROM Assessment, StudentCourse INNER JOIN CourseInfo ON StudentCourse.courseInfoID = CourseInfo.courseInfoID WHERE Assessment.studentCourseID = StudentCourse.studentCourseID AND StudentCourse.grade = 'IP' AND userID = ? ORDER BY dateEntered";
@@ -132,11 +112,12 @@ class SemesterDashboardController
             $new =  $output[$i][0];
             if (!isset($arr[$new])) {
                 $arr[$new] = 1;
-                array_push($legend, $new);
+                array_push($return, $new);
             }
         }
 
-        echo json_encode($legend);
+        echo json_encode($return);
+        return $return;
     }
 
     function getGraphData() {
@@ -236,11 +217,8 @@ class SemesterDashboardController
 
             //while - y <= checkSize()
             while ($y <= $timePeriodSize) {
-
                 foreach ($tempArray as list($tp, $ci, $ag)) { //tp - time period, ci - course id, ag - average grade
-
                     if ($currTrackCourse == $ci && $y == $tp) {
-
                         array_push($plots, array($this->dateOfTerm($semester, $tp, $year), $ag));
                         $currAverage = $ag;
                         $found = true;
@@ -261,6 +239,7 @@ class SemesterDashboardController
         }
 
         echo json_encode($allPoints);
+        return $allPoints;
     }
 
     function dateOfTerm($term, $timePeriod, $year) {

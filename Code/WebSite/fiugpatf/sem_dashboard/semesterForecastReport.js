@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
-    start();
     GenerateSemesterForecast();
+    start();
 } );
 
 var currCourse;
@@ -77,14 +77,12 @@ function start() {
 }
 
 function GenerateSemesterForecast() {
-    var creditsTaken = 0;
     var creditsLeft = 0;
     var GPAGoal = 0;
     var totalGradePoints = 0;
     var allCourseCredits = 0;
     var creditsInProgress;
     var accurateGPA;
-    var currentURL = 'current.php';
     var classesImported = true;
 
 
@@ -116,10 +114,9 @@ function GenerateSemesterForecast() {
         },
         success: function(data) {
 
-            creditsTaken = parseInt(data[0][0]);
-            creditsLeft = parseInt(data[0][1]);
+            creditsLeft = parseInt(data[0][0]);
 
-            if(data[0][0] === null || data[0][1] === null) { //check if values are null
+            if(data[0][0] === null) { //check if values are null
                 classesImported = false;
             }
         },
@@ -129,23 +126,6 @@ function GenerateSemesterForecast() {
     });
 
     if (classesImported) {
-        $.ajax({
-            type: 'POST',
-            async: false,
-            url: router,
-            dataType: 'json',
-            data: {
-                action: 'takenAndRemaining'
-            },
-            success: function(data) {
-
-                creditsTaken = parseInt(data[0][0]);
-                creditsLeft = parseInt(data[0][1]);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert(errorThrown);
-            }
-        });
 
         $.ajax({
             type: 'POST',
@@ -427,10 +407,7 @@ function GenerateSemesterForecast() {
             //calculate secureGPAPath
             var secureGPAPath = new Array();
             for(i = 0; i < relevance.length; i++) {
-                if(relevance[i] <= 2.5) {
-                    secureGPAPath[i] = relevance[i] + 1;
-                }
-                else if(relevance[i] == 3) {
+                if(relevance[i] <= 3) {
                     secureGPAPath[i] = relevance[i] + 0.5;
                 }
                 else {
@@ -481,7 +458,7 @@ function GenerateSemesterForecast() {
             for(var i = 0; i < courseID.length; i++) {
                 content += ("<tr><td>" + courseID[i] + "</td>" +
                     "<td>" + weight[i] + "</td>" +
-                    "<td>" + relevance[i] + "</td>" +
+                    "<td>" + Math.floor(relevance[i]) + "</td>" +
                     "<td>" + valueToChar(relevance[i]) + "</td>" +
                     "<td>" + valueToChar(secureGPAPath[i]) + "</td>" +
                     "<td>" + minimumStudyTime[i] + "</td></tr>");

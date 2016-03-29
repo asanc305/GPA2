@@ -82,6 +82,7 @@ function start() {
 
                 $('#current_course').append(legend);
             },
+
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 alert(errorThrown);
             }
@@ -395,12 +396,10 @@ function download(filename, text) {
 }
 
 function CheckSemesterForecast() {
-    var creditsTaken = 0;
     var creditsLeft = 0;
     var GPAGoal = 0;
     var totalGradePoints = 0;
     var allCourseCredits = 0;
-    var currentURL = 'current.php';
     var classesImported = true;
 
     $.ajax({
@@ -431,10 +430,9 @@ function CheckSemesterForecast() {
         },
         success: function(data) {
 
-            creditsTaken = parseInt(data[0][0]);
-            creditsLeft = parseInt(data[0][1]);
+            creditsLeft = parseInt(data[0][0]);
 
-            if(data[0][0] === null || data[0][1] === null) { //check if values are null
+            if(data[0][0] == '') { //check if values are null
                 classesImported = false;
             }
         },
@@ -444,24 +442,6 @@ function CheckSemesterForecast() {
     });
 
     if (classesImported) {
-
-        $.ajax({
-            type: 'POST',
-            async: false,
-            url: router,
-            dataType: 'json',
-            data: {
-                action: 'takenAndRemaining'
-            },
-            success: function(data) {
-
-                creditsTaken = parseInt(data[0][0]);
-                creditsLeft = parseInt(data[0][1]);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert(errorThrown);
-            }
-        });
 
         $.ajax({
             type: 'POST',

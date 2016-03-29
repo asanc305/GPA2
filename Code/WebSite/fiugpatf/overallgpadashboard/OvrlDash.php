@@ -912,7 +912,6 @@ Select b.courseInfoID From (SELECT courseInfoID FROM `MajorBucketRequiredCourses
 )c inner join CourseInfo on CourseInfo.courseInfoID = c.courseInfoID)e
 JOIN
 (Select Sum(CourseInfo.credits) as creditsTaken from CourseInfo inner join StudentCourse on StudentCourse.courseInfoID = CourseInfo.courseInfoID AND StudentCourse.grade not in (Select grade from StudentCourse where grade = 'ND') AND StudentCourse.userID ='" . $userID . "')f)");
-    f.
     $stmt->execute();
     $stmt->bind_result($creditsTaken, $creditsLeft);
     $output = array();
