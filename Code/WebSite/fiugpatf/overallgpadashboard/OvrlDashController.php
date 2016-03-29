@@ -1,15 +1,16 @@
 <?php
 include_once '../common_files/dbconnector.php';
-
-class OverallDashboardController {
-
+class OverallDashboardController
+{
     protected $userID;
     protected $username;
+    protected $log;
 
     public function __construct($userID, $username)
     {
         $this->userID = $userID;
         $this->username = $username;
+        //$this->log = new ErrorLog();
     }
 
     public function getMajorBuckets()
@@ -35,6 +36,7 @@ class OverallDashboardController {
         }
 
         echo json_encode($output);
+        return $output;
     }
 
     public function getProgramInfo()
@@ -47,7 +49,9 @@ class OverallDashboardController {
 
         $output = array();
         array_push($output, $gpa, $curr, $this->username, $programs);
+
         echo json_encode($output);
+        return $output;
     }
 
     private function calculateGpa()
@@ -128,7 +132,7 @@ class OverallDashboardController {
             return 'null';
         }
 
-        $gpa = round($gradePoints / $creditHours, 2);
+        $gpa = round($gradePoints / $creditHours, 2,PHP_ROUND_HALF_UP);
         toLog(0, "DEBUG", __METHOD__, "gpa: $gpa");
         return $gpa;
     }
@@ -140,6 +144,11 @@ class OverallDashboardController {
         $params = array($this->userID);
         $currProgram = $dbc->select("SELECT majorName FROM Major Where majorID in (Select majorID From StudentMajor where userID = ?)", $params);
 
+        if (count($currProgram) == 0)
+        {
+            toLog(0, "DEBUG", __METHOD__, "program: null");
+            return 'null';
+        }
         $x = $currProgram[0][0];
         toLog(0, "DEBUG", __METHOD__, "program: $x");
         return $currProgram[0][0];
@@ -169,17 +178,11 @@ class OverallDashboardController {
         $params = array($this->userID);
         $output = $db->select($stmt, $params);
 
-        if($output[0][0] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseGrade is null");
-        }
-        else if($output[0][1] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseCredits is null");
-        }
-        else if($output[0][2] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseCredits is null");
-        }
-        else if($output[0][3] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseCredits is null");
+        if(count($output) == 0)
+        {
+            toLog(3, 'ff', __METHOD__, "No Data for graph");
+            echo json_encode([]);
+            return;
         }
 
         $averages = []; //this array will have each GPA for each semester
@@ -330,8 +333,6 @@ class OverallDashboardController {
             array_push($return, array($courseID, $courseWeight, $courseRelevance));
         }
         echo json_encode($return);
-
-        return $return;
     }
 
     public function getGPA() {

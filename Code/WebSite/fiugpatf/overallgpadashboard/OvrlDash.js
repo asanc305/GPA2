@@ -1,3 +1,5 @@
+var router = 'OvrlDashRouter.php';
+
 $(document).ready(function() {
     start2();
 });
@@ -399,128 +401,21 @@ function fnGPACalcReturn(grades, credits) {
     return thisGPA;
 }
 
-function fnGPACalc(grades, credits) {
-    var gradepoints = 0;
-    var credithours = 0;
-    //	alert("grades.length: " + grades.length + " grsds[i]: " + grades[0]);
-    for (var i = 0; i < grades.length; i++) {
-        if (grades[i] == "A") {
-            gradepoints = gradepoints + (4 * credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "A-") {
-            gradepoints = gradepoints + (3.70 *
-                credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "B+") {
-            gradepoints = gradepoints + (3.33 *
-                credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "B") {
-            gradepoints = gradepoints + (3.3 * credits[
-                    i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "B-") {
-            gradepoints = gradepoints + (2.70 *
-                credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "C+") {
-            gradepoints = gradepoints + (2.30 *
-                credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "C") {
-            gradepoints = gradepoints + (2 * credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "C-") {
-            gradepoints = gradepoints + (1.70 *
-                credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "D+") {
-            gradepoints = gradepoints + (1.30 *
-                credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "D") {
-            gradepoints = gradepoints + (1.0 * credits[
-                    i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "D-") {
-            gradepoints = gradepoints + (0.70 *
-                credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "F") {
-            gradepoints = gradepoints + (0 * credits[i]);
-            credithours = credithours + (1 * credits[i]);
-        } else if (grades[i] == "IP") {
-            gradepoints = gradepoints + (0 * credits[i]);
-            credithours = credithours + (0 * credits[i]);
-        } else {
-            gradepoints = gradepoints + (0 * credits[i]);
-            credithours = credithours + (0 * credits[i]);
-        }
-    }
-
-    gpa = gradepoints / credithours;
-    gpa = Math.round(gpa * 100) / 100;
-    var text = $('#data p:first').text();
-    var reqGrd = parseInt(text);
-
-    $("#GPACalc").replaceWith('<p id = "GPACalc" style = "font-size:16px;">' +
-        gpa + '</p>');
-    /*      if (gpa >= reqGrd) {
-     $("#GPACalc").css('color', '#E6C12B');
-     var glow = $('#GPACalc');
-     setInterval(function(){
-     glow.hasClass('glow') ? glow.removeClass('glow') : glow.addClass('glow');
-     }, 2000);
-     } else {
-     $("#GPACalc").css('color', 'black');
-     var glow = $('#GPACalc');
-     setInterval(function(){
-     glow.hasClass('glowoff') ? glow.removeClass('glowoff') : glow.addClass('glowoff');
-     }, 2000);
-     }
-
-     */
-}
-
 function GetGPA() {
-    var OvrlDashphpURL = 'OvrlDash.php';
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        url: router,
         dataType: 'json',
         data: {
             action: 'getGPA'
         },
         success: function(data) {
-            var allGrades = [];
-            var allCredits = [];
-
-            for (var i = 0; i < data.length; i++) {
-                allCredits.push(data[i][1]);
-                allGrades.push(data[i][0]);
-            }
-            fnGPACalc(allGrades, allCredits);
+            $("#GPACalc").replaceWith('<p id = "GPACalc" style = "font-size:16px;">' + data[0] + '</p>');
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             alert(errorThrown);
         }
     });
-
-    /*
-     var oSettings = $('#coursesTakenE').dataTable().fnSettings();
-     var rowCount = oSettings.fnRecordsTotal();
-     var gradesForGPA2 = [];
-     var creditsForGPA2 = [];
-     for (var i = 0; i < rowCount; i++) {
-     var id = $('#coursesTakenE').dataTable().fnGetData(i, 2);
-     gradesForGPA2.push(id);
-     var id2 = $('#coursesTakenE').dataTable().fnGetData(i,
-     1);
-     creditsForGPA2.push(id2);
-     }
-     fnGPACalc(gradesForGPA2, creditsForGPA2);
-
-     */
 }
 
 function removeSpace(string) {
@@ -705,10 +600,9 @@ function GenerateForecast() {
 }
 
 function RequirementMet(bucket) {
-    var OvrlDashphpURL = 'OvrlDash.php';
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        url: router,
         dataType: 'json',
         data: {
             action: 'findChildBuckets',
@@ -912,13 +806,12 @@ function adminLogin(adminUser) {
 
 function sto_deleteItem2(divId, nTr) {
     // createLoadingDivAfter(divId,"Deleting Item");
-    var OvrlDashphpURL = 'OvrlDash.php';
     var aData = courseNeeded.fnGetData(nTr);
     var name = aData[1];
     var id = aData[0];
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        url: router,
         dataType: 'json',
         data: {
             action: 'deleteCourseNeeded',
@@ -987,10 +880,9 @@ function sto_openDetailsRow(nTr) {
 
 function sto_addItem(courseID, credits, grade, major) {
     //createLoadingDivAfter(containerId,"Creating Item");
-    var OvrlDashphpURL = 'OvrlDash.php';
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        url: router,
         dataType: 'json',
         data: {
             action: 'addCourse',
@@ -1017,7 +909,6 @@ function sto_addItem(courseID, credits, grade, major) {
 
 function sto_modCourse(oTable, divId, nTr, nGrade, nCID) {
     // createLoadingDivAfter(divId,"Deleting Item");
-    var OvrlDashphpURL = 'OvrlDash.php';
     var aData = oTable.fnGetData(nTr);
     var major = aData[3];
     var grade = aData[2];
@@ -1027,7 +918,7 @@ function sto_modCourse(oTable, divId, nTr, nGrade, nCID) {
     var newGrade = nGrade;
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        url: router,
         dataType: 'json',
         data: {
             action: 'modCourse',
@@ -1058,14 +949,13 @@ function sto_modCourse(oTable, divId, nTr, nGrade, nCID) {
 
 function sto_modWeight(oTable, divId, nTr, nWeight, nRelev) {
     // createLoadingDivAfter(divId,"Deleting Item");
-    var OvrlDashphpURL = 'OvrlDash.php';
     var aData = oTable.fnGetData(nTr);
     var id = aData[0];
     var newRelev = nRelev;
     var newWeight = nWeight;
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        url: router,
         dataType: 'json',
         data: {
             action: 'modWeight',
@@ -1093,7 +983,6 @@ function sto_modWeight(oTable, divId, nTr, nWeight, nRelev) {
 
 function sto_deleteItem(oTable, divId, nTr) {
     // createLoadingDivAfter(divId,"Deleting Item");
-    var OvrlDashphpURL = 'OvrlDash.php';
     var aData = oTable.fnGetData(nTr);
     var credits = aData[1];
     var id = aData[0];
@@ -1101,7 +990,7 @@ function sto_deleteItem(oTable, divId, nTr) {
 
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        url: router,
         dataType: 'json',
         data: {
             action: 'deleteItem',
@@ -1126,10 +1015,14 @@ function sto_deleteItem(oTable, divId, nTr) {
 }
 
 function start2() {
-    var OvrlDashphpURL = 'OvrlDash.php';
+    var graddata = new Array();
+    var buckets = new Array();
+    var admin = 1;
+
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        async: false,
+        url: router,
         dataType: 'json',
         data: {
             action: 'editStudent'
@@ -1142,6 +1035,10 @@ function start2() {
                     alert(data.why);
                     $(location).attr('href', 'OvrlDash.html');
                 }
+            }
+            else{
+                admin = 0;
+                return;
             }
             studRoster = $('#studRost').dataTable({
                 "aaData": data,
@@ -1168,23 +1065,60 @@ function start2() {
             $('#studRost tbody tr td').off();
             $('#studRost tbody tr td').on('click',
                 sto_rowClickHandler3);
+
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             alert(errorThrown);
         }
     });
+    //alert(admin);
+    if (admin == 1)
+        return;
 
-    GetGPA();
-
-    var OvrlDashphpURL = 'OvrlDash.php';
     $.ajax({
         type: 'POST',
-        url: OvrlDashphpURL,
+        async: false,
+        url: router,
+        dataType: 'json',
+        data: {
+            action: 'getProgramInfo'
+        },
+        success: function (data) {
+            $("#GPACalc").replaceWith('<p id = "GPACalc" style = "font-size:16px;">' + data[0] + '</p>');
+
+            $('#studentMajData p').append(data[1]);
+            $('#studentMajData p').replaceWith('<p>' + data[1] + '</p>');
+
+            $("#studName").append(', ' + data[2]);
+
+            graddata = data[3];
+            for (var i = 0; i < data[3].length; i++) {
+                var cs = data[3][i][0];
+                $("#gradprogs").append('<option value ="' + cs +
+                    '">' + cs + '</option>');
+            }
+            for (var i = 0; data[3].length; i++) {
+                if ($("#gradprogs").val() == data[3][i][0]) {
+                    $('#data p').append(data[3][i][1]);
+                }
+            }
+
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: router,
         dataType: 'json',
         data: {
             action: 'getMajorBuckets',
         },
         success: function(data) {
+            buckets = data;
             courseTakenBuckets = $('#parentTableTaken').dataTable({
                 "aaData": data,
                 "aaSorting": [
@@ -1234,10 +1168,9 @@ function start2() {
                     var aData = courseTakenBuckets.fnGetData(nTr);
                     var bucket = aData[1];
 
-                    var OvrlDashphpURL = 'OvrlDash.php';
                     $.ajax({
                         type: 'POST',
-                        url: OvrlDashphpURL,
+                        url: router,
                         dataType: 'json',
                         data: {
                             action: 'findChildBuckets',
@@ -1272,11 +1205,9 @@ function start2() {
                     nTr), "ui-state-highlight");
                 var childTableDTTaken = null;
 
-                var OvrlDashphpURL = 'OvrlDash.php';
-
                 $.ajax({
                     type: 'POST',
-                    url: OvrlDashphpURL,
+                    url: router,
                     dataType: 'json',
                     data: {
                         action: 'getMajorBucketsChildBuckets',
@@ -1321,11 +1252,9 @@ function start2() {
 
                                 var aData = childTableDTTaken.fnGetData(nTr);
                                 var bucket = aData[1];
-
-                                var OvrlDashphpURL = 'OvrlDash.php';
                                 $.ajax({
                                     type: 'POST',
-                                    url: OvrlDashphpURL,
+                                    url: router,
                                     dataType: 'json',
                                     data: {
                                         action: 'findChildBuckets',
@@ -1370,10 +1299,9 @@ function start2() {
                 var bucket = aData[1];
 
                 var childTableDT;
-                var OvrlDashphpURL = 'OvrlDash.php';
                 $.ajax({
                     type: 'POST',
-                    url: OvrlDashphpURL,
+                    url: router,
                     dataType: 'json',
                     data: {
                         action: 'getMajorBucketsCourse',
@@ -1468,587 +1396,563 @@ function start2() {
                     }
                 });
             }
+
+            displayNeeded();
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
             alert(errorThrown);
         }
     });
 
-    $.ajax({
-        type: 'POST',
-        url: OvrlDashphpURL,
-        dataType: 'json',
-        data: {
-            action: 'getMajorBucketsNeeded',
-        },
-        success: function(data) {
+    function displayNeeded() {
+        courseNeededBuckets = $('#parentTable').dataTable({
+            "aaData": buckets,
+            "aaSorting": [
+                [0, "asc"]
+            ],
+            "aoColumns": [
+                //{ "bVisible": true},
+                {
+                    "sTitle": ""
+                }, {
+                    "sTitle": "Courses Needed"
+                }, {
+                    "sTitle": "All Required"
+                },
+            ],
+            order: [1, "asc"],
+            columnDefs: [{
+                sortable: false,
+                targets: [0]
+            }],
+            "bJQueryUI": true,
+            "retrieve": true,
+            "iDisplayLength": 25
+        });
 
-            courseNeededBuckets = $('#parentTable').dataTable({
-                "aaData": data,
-                "aaSorting": [
-                    [0, "asc"]
-                ],
-                "aoColumns": [
-                    //{ "bVisible": true},
-                    {
-                        "sTitle": ""
-                    }, {
-                        "sTitle": "Courses Needed"
-                    }, {
-                        "sTitle": "All Required"
-                    },
-                ],
-                order: [1, "asc"],
-                columnDefs: [{
-                    sortable: false,
-                    targets: [0]
-                }],
-                "bJQueryUI": true,
-                "retrieve": true,
-                "iDisplayLength": 25
-            });
+        // $('#parentTableTaken').removeAttr("style");
+        $('#parentTable tbody tr td').off();
+        $('#parentTable tbody tr td').on('click',
+            clickBucket);
 
-            // $('#parentTableTaken').removeAttr("style");
-            $('#parentTable tbody tr td').off();
-            $('#parentTable tbody tr td').on('click',
-                clickBucket);
+        $("#generateForecast").click(function() {
 
-            $("#generateForecast").click(function() {
-
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i][2] == "NO") {
-                        noes++;
-                        RequirementMet(data[i][1]);
-                    }
-                }
-
-                setTimeout(function() {
-                    GenerateForecast();
-
-                }, 1000);
-
-            });
-
-            function clickBucket() {
-                var nTr = this.parentNode;
-
-                var open = false;
-                try {
-                    if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
-                        open = true;
-                } catch (err) {
-                    alert(err);
-                }
-                if (open) {
-                    /* This row is already open - close it */
-                    courseNeededBuckets.fnClose(nTr);
-                    $(nTr).css("color", "");
-                } else {
-                    var aData = courseNeededBuckets.fnGetData(nTr);
-                    var bucket = aData[1];
-
-                    var OvrlDashphpURL = 'OvrlDash.php';
-                    $.ajax({
-                        type: 'POST',
-                        url: OvrlDashphpURL,
-                        dataType: 'json',
-                        data: {
-                            action: 'findChildBuckets',
-                            bucket: bucket
-
-                        },
-                        success: function(data) {
-                            if (data.success) {
-                                // alert ("children found");
-                                openChildBuckets(nTr, courseNeededBuckets);
-
-
-                            } else {
-                                //alert ("no child buckets");
-                                var req = aData[2];
-                                if (req == "YES") {
-                                    openBucket(nTr, courseNeededBuckets);
-                                } else {
-                                    openBucket2(nTr, courseNeededBuckets);
-                                }
-                            }
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                            alert("course doesnt exist");
-                            alert(errorThrown);
-                        }
-                    });
-
+            for (var i = 0; i < data.length; i++) {
+                if (data[i][2] == "NO") {
+                    noes++;
+                    RequirementMet(data[i][1]);
                 }
             }
 
-            function openChildBuckets(nTr, oTable) {
-                var aData = oTable.fnGetData(nTr);
+            setTimeout(function() {
+                GenerateForecast(data);
+
+            }, 1000);
+
+        });
+
+        function clickBucket() {
+            var nTr = this.parentNode;
+
+            var open = false;
+            try {
+                if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
+                    open = true;
+            } catch (err) {
+                alert(err);
+            }
+            if (open) {
+                /* This row is already open - close it */
+                courseNeededBuckets.fnClose(nTr);
+                $(nTr).css("color", "");
+            } else {
+                var aData = courseNeededBuckets.fnGetData(nTr);
                 var bucket = aData[1];
-
-                var req = aData[2];
-
-                oTable.fnOpen(nTr, sto_formatDataTableNeededChildBuckets(oTable,
-                    nTr), "ui-state-highlight");
-                var childTableDTNeeded2 = null;
-
-                var OvrlDashphpURL = 'OvrlDash.php';
 
                 $.ajax({
                     type: 'POST',
-                    url: OvrlDashphpURL,
+                    url: router,
                     dataType: 'json',
                     data: {
-                        action: 'getMajorBucketsChildBuckets',
+                        action: 'findChildBuckets',
                         bucket: bucket
+
                     },
                     success: function(data) {
-                        var bucketHTMLID = removeSpace(bucket);
-                        //alert(bucketHTMLID);
-                        childTableDTNeeded2 = $('#childBucketsDT' + bucketHTMLID).dataTable({
-                            "aaData": data,
-                            "aoColumns": [{
-                                "sTitle": ""
-                            }, {
-                                "sTitle": "subbucket name"
-                            }, {
-                                "sTitle": "all required"
-                            }, ],
+                        if (data.success) {
+                            // alert ("children found");
+                            openChildBuckets(nTr, courseNeededBuckets);
 
-                            "bAutoWidth": false,
-                            "sPaginationType": "full_numbers",
-                            "retrieve": true
-                        });
-                        $('#childBucketsDT' + bucketHTMLID + ' tbody tr td').off();
-                        $('#childBucketsDT' + bucketHTMLID + ' tbody tr td').on('click', clickBucket2);
 
-                        RequirementMet(bucket);
-
-                        function clickBucket2() {
-                            var nTr = this.parentNode;
-
-                            var open = false;
-                            try {
-                                if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
-                                    open = true;
-                            } catch (err) {
-                                alert(err);
-                            }
-                            if (open) {
-                                /* This row is already open - close it */
-                                childTableDTNeeded2.fnClose(nTr);
-                                $(nTr).css("color", "");
+                        } else {
+                            //alert ("no child buckets");
+                            openBucket(nTr, courseNeededBuckets);
+                            /*var req = aData[2];
+                            if (req == "YES") {
+                                openBucket(nTr, courseNeededBuckets);
                             } else {
-
-                                var aData = childTableDTNeeded2.fnGetData(nTr);
-                                var bucket = aData[1];
-
-                                var OvrlDashphpURL = 'OvrlDash.php';
-                                $.ajax({
-                                    type: 'POST',
-                                    url: OvrlDashphpURL,
-                                    dataType: 'json',
-                                    data: {
-                                        action: 'findChildBuckets',
-                                        bucket: bucket
-
-                                    },
-                                    success: function(data) {
-                                        if (data.success) {
-                                            // alert ("children found");
-
-                                            openChildBuckets(nTr, childTableDTNeeded2);
-                                        } else {
-                                            // alert ("no child buckets");
-                                            var req = aData[2];
-                                            if (req == "YES") {
-                                                openBucket(nTr, childTableDTNeeded2);
-                                            } else {
-                                                openBucket2(nTr, childTableDTNeeded2);
-                                            }
-                                        }
-
-
-                                    },
-                                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                                        alert("course doesnt exist");
-                                        alert(errorThrown);
-                                    }
-                                });
-
-                            }
+                                openBucket2(nTr, courseNeededBuckets);
+                            }*/
                         }
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("course doesnt exist");
                         alert(errorThrown);
                     }
                 });
+
             }
+        }
 
-            function openBucket(nTr, oTable) {
-                var aData = oTable.fnGetData(nTr);
-                var bucket = aData[1];
-                var req = aData[2];
+        function openChildBuckets(nTr, oTable) {
+            var aData = oTable.fnGetData(nTr);
+            var bucket = aData[1];
 
-                oTable.fnOpen(nTr, sto_formatDataTableNeeded(oTable,
-                    nTr), "ui-state-highlight");
+            var req = aData[2];
 
-                var childTableDTNeeded;
-                var OvrlDashphpURL = 'OvrlDash.php';
+            oTable.fnOpen(nTr, sto_formatDataTableNeededChildBuckets(oTable,
+                nTr), "ui-state-highlight");
+            var childTableDTNeeded2 = null;
 
-                $.ajax({
-                    type: 'POST',
-                    url: OvrlDashphpURL,
-                    dataType: 'json',
-                    data: {
-                        action: 'getMajorBucketsCourseNeeded',
-                        bucket: bucket
-                    },
-                    success: function(data) {
-                        var bucketHTMLID = removeSpace(bucket);
-                        childTableDTNeeded = $('#coursesNeededDT' + bucketHTMLID).dataTable({
-                            "aaData": data,
-                            "aoColumns": [{
-                                "sTitle": "Course ID"
-                            }, {
-                                "sTitle": "Credits"
-                            }, {
-                                "sTitle": "Weight"
-                            }, {
-                                "sTitle": "Relevance"
-                            }, ],
+            $.ajax({
+                type: 'POST',
+                url: router,
+                dataType: 'json',
+                data: {
+                    action: 'getMajorBucketsChildBuckets',
+                    bucket: bucket
+                },
+                success: function(data) {
+                    var bucketHTMLID = removeSpace(bucket);
+                    //alert(bucketHTMLID);
+                    childTableDTNeeded2 = $('#childBucketsDT' + bucketHTMLID).dataTable({
+                        "aaData": data,
+                        "aoColumns": [{
+                            "sTitle": ""
+                        }, {
+                            "sTitle": "subbucket name"
+                        }, {
+                            "sTitle": "all required"
+                        }, ],
 
-                            "bAutoWidth": false,
-                            "sPaginationType": "full_numbers",
-                            "retrieve": true,
-                            "iDisplayLength": 25
-                        });
-                        $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td').off();
-                        $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td').on('click',
-                            sto_rowClickHandlerNeeded);
-
-                        function sto_rowClickHandlerNeeded() {
-                            var nTr = this.parentNode;
-                            var open = false;
-                            try {
-                                if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
-                                    open = true;
-                            } catch (err) {
-                                alert(err);
-                            }
-                            if (open) {
-                                /* This row is already open - close it */
-                                childTableDTNeeded.fnClose(nTr);
-                                $(nTr).css("color", "");
-                            } else {
-                                sto_openDetailsRowNeeded(nTr);
-                            }
-                        }
-
-                        function sto_openDetailsRowNeeded(nTr) {
-                            childTableDTNeeded.fnOpen(nTr, sto_formatStoreManagerDetails2(childTableDTNeeded, nTr),
-                                "ui-state-highlight");
-                            var aData = childTableDTNeeded.fnGetData(nTr);
-                            $("#modifyItem" + aData[0]).button();
-                            $("#moveItem" + aData[0]).button();
-                            var divId = "#itemDetails" + aData[0];
-                            $("#modifyItem" + aData[0]).click(function() {
-                                $("#pop2").dialog();
-                                $('#pop2').on('dialogclose', function(event) {
-                                    childTableDTNeeded.fnClose(nTr);
-
-                                    $(nTr).css("color", "#c5dbec");
-                                    $("#pop2").remove();
-                                });(divId).empty();
-                            });
-                            $("#modSubmit2").click(function() {
-                                nRelev = $("input[name=nRelev]").val();
-                                nWeight = $("input[name=nWeight]").val();
-                                sto_modWeight(childTableDTNeeded, divId, nTr, nWeight, nRelev);
-                                childTableDTNeeded.fnUpdate([aData[0], aData[1], nWeight, nRelev],
-                                    nTr);
-                                $('#pop2').dialog('close');
-                            });
-
-                            $("#moveItem" + aData[0]).click(function() {
-                                $(nTr).css("color", "#c5dbec");
-                                addArrow(childTableDTNeeded, nTr);
-                            });
-                        }
-
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        alert(errorThrown);
-                    }
-
-                });
-            }
-
-            function openBucket2(nTr, oTable) {
-                var aData = oTable.fnGetData(nTr);
-                var bucket = aData[1];
-                var req = aData[2];
-
-                if (bucket != "Natural Sciences - Group 1" && bucket != "Natural Sciences - Group 2") {
-                    oTable.fnOpen(nTr, sto_formatDataTableNeeded2(oTable,
-                        nTr), "ui-state-highlight");
-                } else {
-                    oTable.fnOpen(nTr, sto_formatDataTableNaturalScience(oTable,
-                        nTr), "ui-state-highlight");
-                }
-                var childTableDTNeededCourses;
-                var OvrlDashphpURL = 'OvrlDash.php';
-
-
-                $("#addECButton").click(function() {
-
-                    var course = $("input[name=courseAdded]").val();
-                    //alert("course added: " + course + bucket);
-                    var sure = confirm("Please check with your advisor before continuing. Does the course entered meet the criteria for the category requirement?");
-                    if (sure)
-                        AddExtraCourse(course, bucket);
-
-                });
-
-                function RequirementMet(bucket) {
-
-                    var OvrlDashphpURL = 'OvrlDash.php';
-                    $.ajax({
-                        type: 'POST',
-                        url: OvrlDashphpURL,
-                        dataType: 'json',
-                        data: {
-                            action: 'findChildBuckets',
-                            bucket: bucket
-                        },
-                        success: function(data) {
-                            //alert(JSON.stringify(data)+"data");
-                            if (data.success) {
-                                alert("children found");
-                            } else {
-                                // alert ("no child buckets");
-                                GetCourseReqs(bucket);
-                            }
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                            alert("course doesnt exist");
-                            alert(errorThrown);
-                        }
+                        "bAutoWidth": false,
+                        "sPaginationType": "full_numbers",
+                        "retrieve": true
                     });
+                    $('#childBucketsDT' + bucketHTMLID + ' tbody tr td').off();
+                    $('#childBucketsDT' + bucketHTMLID + ' tbody tr td').on('click', clickBucket2);
 
-                }
+                    //RequirementMet(bucket);
 
-                RequirementMet(bucket);
+                    function clickBucket2() {
+                        var nTr = this.parentNode;
 
-                function GetCourseReqs(bucket) {
-                    $.ajax({
-                        type: 'POST',
-                        url: OvrlDashphpURL,
-                        dataType: 'json',
-                        data: {
-                            action: 'getMinReq',
-                            bucket: bucket
-                        },
-                        success: function(data) {
-                            var change = bucket;
-                            var changes = JSON.stringify(bucket);
-                            //	alert("selected: "+data[0][0] + " req: "+data[0][1]);
-                            if (data[0][0] >= data[0][1]) {
-                                //if (append ==false){
-                                if ($("td:contains('" + change + "')").text().length / 2 == bucket.length) {
-
-                                    var elem = $("td:contains('" + change + "')");
-                                    //
-                                    elem.append('<p style = "font-size:9px;color:blue;" class = "appendReq' + bucket + '"> Requirement met</p>');
-                                    append = true;
-                                    //alert("requirement met Req: " + data[0][0] + " selectd: " + data[0][1]   );
-                                }
-                            } else {
-                                //alert("requirement not met");
-                                $("td:contains('" + change + "')").children().remove();
-                                //('<p>').attr('class','appendReq' + bucket).remove
-                                append = false;
-                                //alert("requirement not met");
-                            }
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                            alert(errorThrown);
+                        var open = false;
+                        try {
+                            if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
+                                open = true;
+                        } catch (err) {
+                            alert(err);
                         }
-                    });
-                }
+                        if (open) {
+                            /* This row is already open - close it */
+                            childTableDTNeeded2.fnClose(nTr);
+                            $(nTr).css("color", "");
+                        } else {
 
-                function AddExtraCourse(courseID, bucket) {
-                    $.ajax({
-                        type: 'POST',
-                        url: OvrlDashphpURL,
-                        dataType: 'json',
-                        data: {
-                            action: 'addExtraCourse',
-                            bucket: bucket,
-                            courseID: courseID
-                        },
-                        success: function(data) {
-                            if (data.success) {
-                                alert("course added");
-                            } else {
-                                alert("course doesnt exist ifdata");
-                            }
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                            alert("course doesnt exist");
-                            alert(errorThrown);
-                        }
-                    });
-                }
+                            var aData = childTableDTNeeded2.fnGetData(nTr);
+                            var bucket = aData[1];
 
-                var childTableDTNeededCourses2;
-                $.ajax({
-                    type: 'POST',
-                    url: OvrlDashphpURL,
-                    dataType: 'json',
-                    data: {
-                        action: 'getMajorBucketsCourseNeeded',
-                        bucket: bucket
-                    },
-                    success: function(data) {
-                        //	alert(JSON.stringify(data)+ ": openbucket2data");
-                        var bucketHTMLID = removeSpace(bucket);
-                        childTableDTNeededCourses2 = $('#coursesNeededDT' + bucketHTMLID).dataTable({
-                            "aaData": data,
-                            "aoColumns": [{
-                                "sTitle": "Course ID"
-                            }, {
-                                "sTitle": "Credits"
-                            }, {
-                                "sTitle": "Weight"
-                            }, {
-                                "sTitle": "Relevance"
-                            }, {
-                                "sTitle": "Select"
-                            }, ],
-
-                            "bAutoWidth": false,
-                            "sPaginationType": "full_numbers",
-                            "retrieve": true,
-                            "iDisplayLength": 25
-                        });
-
-                        $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(-n+4)').off();
-                        $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(-n+4)').on('click',
-                            sto_rowClickHandlerNeeded);
-                        $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(5)').off();
-                        $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(5)').on('click',
-                            CheckboxChange);
-
-
-                        function CheckboxChange() {
-
-
-
-                            var nTr = this.parentNode;
-                            var aData = childTableDTNeededCourses2.fnGetData(nTr);
-                            var courseID = aData[0];
-                            var state;
-                            if ($('#' + courseID + 'check').prop('checked'))
-
-                            {
-                                //alert("checked");
-                                document.getElementById(courseID + "check").checked = false;
-                                state = 0;
-                                ChangeCheckboxAjax(state, courseID);
-                            } else {
-                                // alert("not chcked");
-                                document.getElementById(courseID + "check").checked = true;
-                                state = 1;
-                                ChangeCheckboxAjax(state, courseID);
-                            }
-                        }
-
-                        function ChangeCheckboxAjax(state, courseID) {
-
-                            var OvrlDashphpURL = 'OvrlDash.php';
                             $.ajax({
                                 type: 'POST',
-                                url: OvrlDashphpURL,
+                                url: router,
                                 dataType: 'json',
                                 data: {
-                                    action: 'changeSelected',
-                                    state: state,
-                                    courseID: courseID
+                                    action: 'findChildBuckets',
+                                    bucket: bucket
+
                                 },
                                 success: function(data) {
+                                    if (data.success) {
+                                        // alert ("children found");
+
+                                        openChildBuckets(nTr, childTableDTNeeded2);
+                                    } else {
+                                        // alert ("no child buckets");
+                                        var req = aData[2];
+                                        if (req == "YES") {
+                                            openBucket(nTr, childTableDTNeeded2);
+                                        } else {
+                                            openBucket2(nTr, childTableDTNeeded2);
+                                        }
+                                    }
+
 
                                 },
                                 error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                    alert("course doesnt exist");
                                     alert(errorThrown);
                                 }
                             });
-                            RequirementMet(bucket);
 
                         }
+                    }
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
 
-                        function sto_rowClickHandlerNeeded() {
-                            var nTr = this.parentNode;
-                            var open = false;
+        function openBucket(nTr, oTable) {
+            var aData = oTable.fnGetData(nTr);
+            var bucket = aData[1];
+            var req = aData[2];
 
-                            try {
-                                if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
-                                    open = true;
-                            } catch (err) {
-                                alert(err);
-                            }
-                            if (open) {
-                                /* This row is already open - close it */
-                                childTableDTNeededCourses2.fnClose(nTr);
-                                $(nTr).css("color", "");
-                            } else {
-                                sto_openDetailsRowNeeded(nTr);
-                            }
+            oTable.fnOpen(nTr, sto_formatDataTableNeeded2(oTable,
+                nTr), "ui-state-highlight");
+
+            var childTableDTNeeded;
+
+            $.ajax({
+                type: 'POST',
+                url: router,
+                dataType: 'json',
+                data: {
+                    action: 'getMajorBucketsCourseNeeded',
+                    bucket: bucket
+                },
+                success: function(data) {
+                    var bucketHTMLID = removeSpace(bucket);
+                    childTableDTNeeded = $('#coursesNeededDT' + bucketHTMLID).dataTable({
+                        "aaData": data,
+                        "aoColumns": [{
+                            "sTitle": "Course ID"
+                        }, {
+                            "sTitle": "Credits"
+                        }, {
+                            "sTitle": "Weight"
+                        }, {
+                            "sTitle": "Relevance"
+                        }, ],
+
+                        "bAutoWidth": false,
+                        "sPaginationType": "full_numbers",
+                        "retrieve": true,
+                        "iDisplayLength": 25
+                    });
+                    $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td').off();
+                    $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td').on('click',
+                        sto_rowClickHandlerNeeded);
+
+                    function sto_rowClickHandlerNeeded() {
+                        var nTr = this.parentNode;
+                        var open = false;
+                        try {
+                            if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
+                                open = true;
+                        } catch (err) {
+                            alert(err);
                         }
+                        if (open) {
+                            /* This row is already open - close it */
+                            childTableDTNeeded.fnClose(nTr);
+                            $(nTr).css("color", "");
+                        } else {
+                            sto_openDetailsRowNeeded(nTr);
+                        }
+                    }
 
-                        function sto_openDetailsRowNeeded(nTr) {
-                            childTableDTNeededCourses2.fnOpen(nTr, sto_formatStoreManagerDetails2(childTableDTNeededCourses2, nTr),
-                                "ui-state-highlight");
-                            var aData = childTableDTNeededCourses2.fnGetData(nTr);
-                            $("#modifyItem" + aData[0]).button();
-                            $("#moveItem" + aData[0]).button();
-                            var divId = "#itemDetails" + aData[0];
-                            $("#modifyItem" + aData[0]).click(function() {
-                                $("#pop2").dialog();
-                                $('#pop2').on('dialogclose', function(event) {
-                                    childTableDTNeededCourses2.fnClose(nTr);
+                    function sto_openDetailsRowNeeded(nTr) {
+                        childTableDTNeeded.fnOpen(nTr, sto_formatStoreManagerDetails2(childTableDTNeeded, nTr),
+                            "ui-state-highlight");
+                        var aData = childTableDTNeeded.fnGetData(nTr);
+                        $("#modifyItem" + aData[0]).button();
+                        $("#moveItem" + aData[0]).button();
+                        var divId = "#itemDetails" + aData[0];
+                        $("#modifyItem" + aData[0]).click(function() {
+                            $("#pop2").dialog();
+                            $('#pop2').on('dialogclose', function(event) {
+                                childTableDTNeeded.fnClose(nTr);
 
-                                    $(nTr).css("color", "#c5dbec");
-                                    $("#pop2").remove();
-                                });(divId).empty();
-                            });
-                            $("#modSubmit2").click(function() {
-                                nRelev = $("input[name=nRelev]").val();
-                                nWeight = $("input[name=nWeight]").val();
-                                sto_modWeight(childTableDTNeededCourses2, divId, nTr, nWeight, nRelev);
-                                childTableDTNeededCourses2.fnUpdate([aData[0], aData[1], nWeight, nRelev, aData[4]],
-                                    nTr);
-                                $('#pop2').dialog('close');
-                            });
-
-                            $("#moveItem" + aData[0]).click(function() {
                                 $(nTr).css("color", "#c5dbec");
-                                addArrow(childTableDTNeededCourses2, nTr);
-                            });
+                                $("#pop2").remove();
+                            });(divId).empty();
+                        });
+                        $("#modSubmit2").click(function() {
+                            nRelev = $("input[name=nRelev]").val();
+                            nWeight = $("input[name=nWeight]").val();
+                            sto_modWeight(childTableDTNeeded, divId, nTr, nWeight, nRelev);
+                            childTableDTNeeded.fnUpdate([aData[0], aData[1], nWeight, nRelev],
+                                nTr);
+                            $('#pop2').dialog('close');
+                        });
+
+                        $("#moveItem" + aData[0]).click(function() {
+                            $(nTr).css("color", "#c5dbec");
+                            addArrow(childTableDTNeeded, nTr);
+                        });
+                    }
+
+                    if (data.length == 0)
+                    {
+                        var change = bucket;
+                        if ($("td:contains('" + change + "')").text().indexOf("Requirement") == -1) {
+
+                            var elem = $("td:contains('" + change + "')");
+
+                            elem.append('<p style = "font-size:9px;color:blue;" class = "appendReq' + bucket + '"> Requirement met</p>');
+                        }
+                    }
+
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+
+            });
+        }
+
+        function openBucket2(nTr, oTable) {
+            var aData = oTable.fnGetData(nTr);
+            var bucket = aData[1];
+            var req = aData[2];
+
+            if (bucket != "Natural Sciences - Group 1" && bucket != "Natural Sciences - Group 2") {
+                oTable.fnOpen(nTr, sto_formatDataTableNeeded2(oTable,
+                    nTr), "ui-state-highlight");
+            } else {
+                oTable.fnOpen(nTr, sto_formatDataTableNaturalScience(oTable,
+                    nTr), "ui-state-highlight");
+            }
+            var childTableDTNeededCourses;
+
+            $("#addECButton").click(function() {
+
+                var course = $("input[name=courseAdded]").val();
+                //alert("course added: " + course + bucket);
+                var sure = confirm("Please check with your advisor before continuing. Does the course entered meet the criteria for the category requirement?");
+                if (sure)
+                    AddExtraCourse(course, bucket);
+
+            });
+
+/*            function GetCourseReqs(bucket) {
+                $.ajax({
+                    type: 'POST',
+                    url: OvrlDashphpURL,
+                    dataType: 'json',
+                    data: {
+                        action: 'getMinReq',
+                        bucket: bucket
+                    },
+                    success: function(data) {
+                        var change = bucket;
+                        var changes = JSON.stringify(bucket);
+                        //	alert("selected: "+data[0][0] + " req: "+data[0][1]);
+                        if (data[0][0] >= data[0][1]) {
+                            //if (append ==false){
+                            if ($("td:contains('" + change + "')").text().length / 2 == bucket.length) {
+
+                                var elem = $("td:contains('" + change + "')");
+                                //
+                                elem.append('<p style = "font-size:9px;color:blue;" class = "appendReq' + bucket + '"> Requirement met</p>');
+                                append = true;
+                                //alert("requirement met Req: " + data[0][0] + " selectd: " + data[0][1]   );
+                            }
+                        } else {
+                            //alert("requirement not met");
+                            $("td:contains('" + change + "')").children().remove();
+                            //('<p>').attr('class','appendReq' + bucket).remove
+                            append = false;
+                            //alert("requirement not met");
                         }
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert(errorThrown);
                     }
-
                 });
             }
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert(errorThrown);
-        }
 
-    });
+            function AddExtraCourse(courseID, bucket) {
+                $.ajax({
+                    type: 'POST',
+                    url: OvrlDashphpURL,
+                    dataType: 'json',
+                    data: {
+                        action: 'addExtraCourse',
+                        bucket: bucket,
+                        courseID: courseID
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            alert("course added");
+                        } else {
+                            alert("course doesnt exist ifdata");
+                        }
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("course doesnt exist");
+                        alert(errorThrown);
+                    }
+                });
+            }*/
+
+            var childTableDTNeededCourses2;
+            $.ajax({
+                type: 'POST',
+                url: router,
+                dataType: 'json',
+                data: {
+                    action: 'getMajorBucketsCourseNeeded',
+                    bucket: bucket
+                },
+                success: function(data) {
+                    //	alert(JSON.stringify(data)+ ": openbucket2data");
+                    var bucketHTMLID = removeSpace(bucket);
+                    childTableDTNeededCourses2 = $('#coursesNeededDT' + bucketHTMLID).dataTable({
+                        "aaData": data,
+                        "aoColumns": [{
+                            "sTitle": "Course ID"
+                        }, {
+                            "sTitle": "Credits"
+                        }, {
+                            "sTitle": "Weight"
+                        }, {
+                            "sTitle": "Relevance"
+                        }, {
+                            "sTitle": "Select"
+                        }, ],
+
+                        "bAutoWidth": false,
+                        "sPaginationType": "full_numbers",
+                        "retrieve": true,
+                        "iDisplayLength": 25
+                    });
+
+                    $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(-n+4)').off();
+                    $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(-n+4)').on('click',
+                        sto_rowClickHandlerNeeded);
+                   /* $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(5)').off();
+                    $('#coursesNeededDT' + bucketHTMLID + ' tbody tr td:nth-child(5)').on('click',
+                        CheckboxChange);*/
+
+                    if (data.length == 0)
+                    {
+                        var change = bucket;
+                        if ($("td:contains('" + change + "')").text().indexOf("Requirement") == -1) {
+
+                            var elem = $("td:contains('" + change + "')");
+
+                            elem.append('<p style = "font-size:9px;color:blue;" class = "appendReq' + bucket + '"> Requirement met</p>');
+                        }
+                    }
+
+
+/*                    function CheckboxChange() {
+
+
+
+                        var nTr = this.parentNode;
+                        var aData = childTableDTNeededCourses2.fnGetData(nTr);
+                        var courseID = aData[0];
+                        var state;
+                        if ($('#' + courseID + 'check').prop('checked'))
+
+                        {
+                            //alert("checked");
+                            document.getElementById(courseID + "check").checked = false;
+                            state = 0;
+                            ChangeCheckboxAjax(state, courseID);
+                        } else {
+                            // alert("not chcked");
+                            document.getElementById(courseID + "check").checked = true;
+                            state = 1;
+                            ChangeCheckboxAjax(state, courseID);
+                        }
+                    }
+
+                    function ChangeCheckboxAjax(state, courseID) {
+
+                        var OvrlDashphpURL = 'OvrlDash.php';
+                        $.ajax({
+                            type: 'POST',
+                            url: OvrlDashphpURL,
+                            dataType: 'json',
+                            data: {
+                                action: 'changeSelected',
+                                state: state,
+                                courseID: courseID
+                            },
+                            success: function(data) {
+
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                alert(errorThrown);
+                            }
+                        });
+                        RequirementMet(bucket);
+
+                    }*/
+
+                    function sto_rowClickHandlerNeeded() {
+                        var nTr = this.parentNode;
+                        var open = false;
+
+                        try {
+                            if ($(nTr).next().children().first().hasClass("ui-state-highlight"))
+                                open = true;
+                        } catch (err) {
+                            alert(err);
+                        }
+                        if (open) {
+                            /!* This row is already open - close it *!/
+                            childTableDTNeededCourses2.fnClose(nTr);
+                            $(nTr).css("color", "");
+                        } else {
+                            sto_openDetailsRowNeeded(nTr);
+                        }
+                    }
+
+                    function sto_openDetailsRowNeeded(nTr) {
+                        childTableDTNeededCourses2.fnOpen(nTr, sto_formatStoreManagerDetails2(childTableDTNeededCourses2, nTr),
+                            "ui-state-highlight");
+                        var aData = childTableDTNeededCourses2.fnGetData(nTr);
+                        $("#modifyItem" + aData[0]).button();
+                        $("#moveItem" + aData[0]).button();
+                        var divId = "#itemDetails" + aData[0];
+                        $("#modifyItem" + aData[0]).click(function() {
+                            $("#pop2").dialog();
+                            $('#pop2').on('dialogclose', function(event) {
+                                childTableDTNeededCourses2.fnClose(nTr);
+
+                                $(nTr).css("color", "#c5dbec");
+                                $("#pop2").remove();
+                            });(divId).empty();
+                        });
+                        $("#modSubmit2").click(function() {
+                            nRelev = $("input[name=nRelev]").val();
+                            nWeight = $("input[name=nWeight]").val();
+                            sto_modWeight(childTableDTNeededCourses2, divId, nTr, nWeight, nRelev);
+                            childTableDTNeededCourses2.fnUpdate([aData[0], aData[1], nWeight, nRelev, aData[4]],
+                                nTr);
+                            $('#pop2').dialog('close');
+                        });
+
+                        $("#moveItem" + aData[0]).click(function() {
+                            $(nTr).css("color", "#c5dbec");
+                            addArrow(childTableDTNeededCourses2, nTr);
+                        });
+                    }
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+
+            });
+        }
+    }
+
     $("#myonoffswitch").click(function() {
         $("#coursesTaken tbody td:nth-child(3) ").toggle();
         // var column = $('#coursesTaken').dataTable().api().column( 13 ).visible( false );
@@ -2058,74 +1962,6 @@ function start2() {
         // Toggle the visibility
         //  column.visible( ! column.visible() );
         $(".GPACalcBox p:nth-child(2)").toggle();
-    });
-
-    $.ajax({
-        type: 'POST',
-        url: OvrlDashphpURL,
-        dataType: 'json',
-        data: {
-            action: 'courseTaken1'
-        },
-        success: function(data) {
-            //              $('.GPATable').html('<table cellpadding="0" cellspacing="0"  style="width:95%" class="display" id="coursesTaken"></table>');
-
-
-
-
-            /*
-             courseTaken = $('#coursesTaken').dataTable({
-             "aaData": data,
-             "aaSorting": [
-             [0, "asc"]
-             ],
-             "aoColumns": [
-             //{ "bVisible": true},
-             {
-             "sTitle": "Course ID"
-             }, {
-             "sTitle": "Credits"
-             }, {
-             "sTitle": "Grade"
-             }
-             ],
-             "bJQueryUI": true,
-             "bAutoWidth": true,
-             "sPaginationType": "full_numbers"
-             });
-             $('#coursesTaken').removeAttr("style");
-             $('#coursesTaken tbody tr td').off();
-             $('#coursesTaken tbody tr td').on('click',
-             sto_rowClickHandler);
-
-
-             */
-            $("#addButton").click(function() {
-                fnAddCourseTaken();
-            });
-            var reqGrdtext = $('#data p:first').text();
-            var curGPAtext = $('#GPACalc').text();
-            var curGPA = parseFloat(curGPAtext);
-            var reqGrd = parseFloat(reqGrdtext);
-            /*  if (curGPA >= reqGrdtext) {
-             $("#GPACalc").css('color', ' #E6C12B');
-             var glow = $('#GPACalc');
-             setInterval(function(){
-             glow.hasClass('glow') ? glow.removeClass('glow') : glow.addClass('glow');
-             }, 2000);
-             } else {
-             $("#GPACalc").css('color', 'black');
-             var glow = $('#GPACalc');
-             setInterval(function(){
-             glow.hasClass('glowoff') ? glow.removeClass('glowoff') : glow.addClass('glowoff');
-             }, 2000);
-             }
-
-             */
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert(errorThrown);
-        }
     });
 
     function fnAddCourseTaken() {
@@ -2140,76 +1976,17 @@ function start2() {
         });
     }
 
-    $.ajax({
-        type: 'POST',
-        url: OvrlDashphpURL,
-        dataType: 'json',
-        data: {
-            action: 'getUser'
-        },
-        success: function(data) {
-            $("#studName").append(', ' + data.name);
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert(errorThrown);
-        }
-    });
-    var graddata = new Array();
     $("#gradprogs").change(function() {
         for (var i = 0; i < graddata.length; i++) {
             if ($("#gradprogs").val() == graddata[i][0]) {
-                //$('#data p').append(graddata[i][1]);
                 $("#data p:first").replaceWith('<p>' + graddata[i]
                         [1] + '</p>');
-                //var reqGrd = parseInt(graddata[i][1]);
                 var reqGrdtext = $('#data p:first').text();
                 var curGPAtext = $('#GPACalc').text();
                 var curGPA = parseFloat(curGPAtext);
                 var reqGrd = parseFloat(reqGrdtext);
-                //alert("Target gpa: " + reqGrd);
-                //alert(" cur gpa: " + curGPA);
-                /*   if (curGPA >= reqGrdtext) {
-                 $("#GPACalc").css('color', ' #E6C12B');
-                 var glow = $('#GPACalc');
-                 setInterval(function(){
-                 glow.hasClass('glow') ? glow.removeClass('glow') : glow.addClass('glow');
-                 }, 2000);
-                 } else {
-                 $("#GPACalc").css('color', ' black');
-                 var glow = $('#GPACalc');
-                 setInterval(function(){
-                 glow.hasClass('glowoff') ? glow.removeClass('glowoff') : glow.addClass('glowoff');
-                 }, 2000);
-                 }
-
-                 */
             }
         }
-    });
-    $.ajax({
-        type: 'POST',
-        url: OvrlDashphpURL,
-        dataType: 'json',
-        data: {
-            action: 'getGradProgram'
-        },
-        success: function(data) {
-            graddata = data;
-            for (var i = 0; i < data.length; i++) {
-                var cs = data[i][0];
-                $("#gradprogs").append('<option value ="' + cs +
-                    '">' + cs + '</option>');
-            }
-            for (var i = 0; data.length; i++) {
-                if ($("#gradprogs").val() == data[i][0]) {
-                    $('#data p').append(data[i][1]);
-                }
-            }
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert(errorThrown);
-        }
-
     });
 
     setTimeout(function() {
@@ -2262,21 +2039,5 @@ function start2() {
             }
         });
     }
-    $.ajax({
-        type: 'POST',
-        url: OvrlDashphpURL,
-        dataType: 'json',
-        data: {
-            action: 'getCurrentProgram'
-        },
-        success: function(data) {
-            $('#studentMajData p').append(data[0][0]);
-            $('#studentMajData p').replaceWith('<p>' + data[0][0] + '</p>');
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-            alert(errorThrown);
-        }
-
-    });
-
 }
+

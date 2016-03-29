@@ -13,11 +13,13 @@ class GPAForecastController {
 
     protected $userID;
     protected $username;
+    protected $log;
 
     public function __construct($userID, $username)
     {
         $this->userID = $userID;
         $this->username = $username;
+        //$this->log = new ErrorLog();
     }
 
     function GPAGoal() {

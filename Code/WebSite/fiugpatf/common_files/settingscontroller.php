@@ -5,11 +5,13 @@ class SettingsController
 {
    protected $user;
    protected $userName;
+   protected $log;
 
    public function __construct($user, $userName)
    {
       $this->user = $user;
       $this->userName = $userName;
+      //$this->log = new ErrorLog();
    }
 
    public function importAudit()
@@ -278,6 +280,9 @@ class SettingsController
 
       foreach($courses as $course)
       {
+         if ($course == "")
+            continue;
+
          $courseDetails = explode("$$&&", $course);
          $semester = $courseDetails[0];
          $year = $courseDetails[1];
@@ -285,6 +290,10 @@ class SettingsController
          $courseName = $courseDetails[3];
          $grade = $courseDetails[4];
          $credits = $courseDetails[5];
+         $ctype = $courseDetails[6];
+
+         if ($ctype == 'TR' or $ctype == 'OT')
+            continue;
 
          //check if course was already taken
          $params = array($grade, $semester, $year, $this->user, $courseID);

@@ -7,14 +7,16 @@ class DatabaseConnector
    protected $pass = "Uzg82t=u%#bNgPJw";
    protected $dbse = "GPA_Tracker";
    protected $mysqli;
+   protected $log;
 
    public function __construct()
    {
       $this->mysqli = new mysqli($this->host, $this->user, $this->pass, $this->dbse);
+      //$this->log = new ErrorLog();
 
       if(!$this->mysqli)
       {
-         toLog(2, "ERROR", "DBCONNECTOR", "Error connection $this->mysqli->error");
+         $this->log->toLog(2, "ERROR", "DBCONNECTOR", "Error connection $this->mysqli->error");
       }
    }
 
@@ -25,7 +27,7 @@ class DatabaseConnector
       if (!$conn)
       {
          $err = $this->mysqli->error;
-         toLog(2, "ERROR", "DatabaseConnector", "Prepare stmt failed $err");
+         $this->log->toLog(2, "ERROR", "DatabaseConnector", "Prepare stmt failed $err");
          return -1;
       }
 
@@ -43,15 +45,16 @@ class DatabaseConnector
          $aParams[] = & $params[$i];
       }
 
-      if (!(call_user_func_array(array($conn, 'bind_param'), $aParams)))
-      {
-         toLog(2, "ERROR", "DatabaseConnector", "Error binding $conn->error");
-         return -1;
+      if ($n > 0) {
+         if (!(call_user_func_array(array($conn, 'bind_param'), $aParams))) {
+            $this->log->toLog(2, "ERROR", "DatabaseConnector", "Error binding $conn->error");
+            return -1;
+         }
       }
 
       if (!($conn->execute()))
       {
-         toLog(2, "ERROR", "DatabaseConnector", "Error executing $conn->error");
+         $this->log->toLog(2, "ERROR", "DatabaseConnector", "Error executing $conn->error");
          return -1;
       }
 
@@ -72,7 +75,7 @@ class DatabaseConnector
       if (!$conn)
       {
          $err = $this->mysqli->error;
-         toLog(2, "ERROR", "DatabaseConnector", "Prepare stmt failed $err");
+         $this->log->toLog(2, "ERROR", "DatabaseConnector", "Prepare stmt failed $err");
          return -1;
       }
 
@@ -92,13 +95,13 @@ class DatabaseConnector
 
       if (!(call_user_func_array(array($conn, 'bind_param'), $aParams)))
       {
-         toLog(2, "ERROR", "DatabaseConnector", "Error binding $conn->error");
+         $this->log->toLog(2, "ERROR", "DatabaseConnector", "Error binding $conn->error");
          return -1;
       }
 
-      if (!($conn->execute()))
+      if ($conn->execute() == false)
       {
-         toLog(2, "ERROR", "DatabaseConnector", "Error executing $conn->error");
+         $this->log->toLog(2, "ERROR", "DatabaseConnector", "Error executing $conn->error");
          return -1;
       }
       $conn->close();

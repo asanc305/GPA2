@@ -1,7 +1,4 @@
 <?php
-
-date_default_timezone_set('America/New_York');
-
 class workerThread extends Thread {
 
    public function __construct($i){
@@ -31,6 +28,7 @@ class workerThread extends Thread {
 
 }
 
+
 function toLog($error_id, $error_type, $location, $details){
    
    $host = php_uname('n');
@@ -43,6 +41,9 @@ function toLog($error_id, $error_type, $location, $details){
 }
 
 function checkConsumer(){
+
+      $root = '/home/sproject/GPA2/Code/WebSite/fiugpatf';
+      //protected $root = $_SERVER['DOCUMENT_ROOT'];
 
       $flgSemKey = sem_get(9876543211);
       $memKey = shm_attach(123456789);
@@ -57,14 +58,14 @@ function checkConsumer(){
 
          if ($flag == 0)
          {
-            exec("php consumer.php > /dev/null 2>/dev/null &");
+             exec("(cd $root/common_files/ && exec php consumer.php > /dev/null 2>/dev/null &)");
             $flag = 1;
             shm_put_var($memKey, $flgKey, $flag);
          }
       }
       else
       {
-         exec("php consumer.php > /dev/null 2>/dev/null &");
+          exec("(cd $root/common_files/ && exec php consumer.php > /dev/null 2>/dev/null &)");
          $flag = 1;
          shm_put_var($memKey, $flgKey, $flag);
       }
