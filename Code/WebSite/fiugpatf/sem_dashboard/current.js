@@ -432,7 +432,7 @@ function CheckSemesterForecast() {
 
             creditsLeft = parseInt(data[0][0]);
 
-            if(data[0][0] == '') { //check if values are null
+            if(data == 'No courses remaining') { //check if values are null
                 classesImported = false;
             }
         },

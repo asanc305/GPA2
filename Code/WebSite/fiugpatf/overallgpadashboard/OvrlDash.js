@@ -433,8 +433,8 @@ function GenerateForecast() {
     var GPAGoal = 0;
     var totalGradePoints = 0;
     var allCourseCredits = 0;
-    var classesImported = true;
     var allSelected = true;
+    var noGrades = false;
     var router = 'OvrlDashRouter.php';
 
     $.ajax({
@@ -447,10 +447,11 @@ function GenerateForecast() {
         },
         success: function(data) {
 
-            creditsLeft = parseInt(data[0][0]);
-
-            if(data[0][0] == '') { //check if values are null
-                classesImported = false;
+            if(data == 'No grades') { //check if values are null
+                noGrades = true;
+            }
+            else {
+                creditsLeft = parseInt(data[0][0]);
             }
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -458,23 +459,11 @@ function GenerateForecast() {
         }
     });
 
-    if (classesImported) {
 
-        $.ajax({
-            type: 'POST',
-            async: false,
-            url: router,
-            dataType: 'json',
-            data: {
-                action: 'GPAGoal'
-            },
-            success: function(data) {
-                GPAGoal = data[0][0];
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert(errorThrown);
-            }
-        });
+    if(noGrades) {
+        alert("No classes are available to generate GPA forecast.\n Please speak to an adviser for further assistance.");
+    }
+    else {
 
         $.ajax({
             type: 'POST',
@@ -485,14 +474,14 @@ function GenerateForecast() {
                 action: 'gradesAndCredits'
             },
             success: function(data2) {
+
                 var gradeChar;
                 var gradeValue;
                 var courseCredits;
                 totalGradePoints = 0;
                 allCourseCredits = 0;
 
-                for(var x = 0; x < data2.length; x++) {
-
+                for (var x = 0; x < data2.length; x++) {
 
                     gradeChar = data2[x][0];
                     courseCredits = parseInt(data2[x][1]);
@@ -554,6 +543,22 @@ function GenerateForecast() {
             }
         });
 
+        $.ajax({
+            type: 'POST',
+            async: false,
+            url: router,
+            dataType: 'json',
+            data: {
+                action: 'GPAGoal'
+            },
+            success: function(data) {
+                GPAGoal = data[0][0];
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+
         //calculate maxGoalGpa
         var maxGoalGPA = ((totalGradePoints +(creditsLeft * 4)) / (allCourseCredits + creditsLeft)).toFixed(2);
         var formattedGPAGoal = parseFloat(GPAGoal);
@@ -593,9 +598,6 @@ function GenerateForecast() {
                 window.open("ovrlForecastReport.html", "Overall GPA Forecast Report");   // Opens a new window for GPA Forecast Report
             }
         }
-    }
-    else {
-        alert("No classes are available to generate GPA forecast.\n Please speak to an adviser for further assistance.");
     }
 }
 
@@ -1437,15 +1439,8 @@ function start2() {
 
         $("#generateForecast").click(function() {
 
-            for (var i = 0; i < data.length; i++) {
-                if (data[i][2] == "NO") {
-                    noes++;
-                    RequirementMet(data[i][1]);
-                }
-            }
-
             setTimeout(function() {
-                GenerateForecast(data);
+                GenerateForecast();
 
             }, 1000);
 
@@ -1995,8 +1990,6 @@ function start2() {
     }, 1000);
 
     function getGraph() {
-        $('#current_course').append('<br><h2 id="gtitle">GPA History</h2>');
-        $('#current_course').append('<div id="placeholder"></div>');
 
         $.ajax({
             type: 'POST',
@@ -2007,32 +2000,40 @@ function start2() {
             },
             success: function(data) {
 
-                var ticks = []; //split data for the x-axis label
-                var avg = [];
-                for(var i = 0; i < data.length; i++) {
-                    ticks.push([i, data[i][0]]);
-                    avg.push([i, data[i][1]]);
+                if(data != 'No data for graph') {
+
+                    $('#current_course').append('<br><h2 id="gtitle">GPA History</h2>');
+                    $('#current_course').append('<div id="placeholder"></div>');
+
+                    var ticks = []; //split data for the x-axis label
+                    var avg = [];
+                    for (var i = 0; i < data.length; i++) {
+                        ticks.push([i, data[i][0]]);
+                        avg.push([i, data[i][1]]);
+                    }
+
+                    var data2 = [avg]; //data to plot
+
+                    $.plot($('#placeholder'), data2, {
+                        xaxis: {
+                            axisLabel: "Semester",
+                            ticks: ticks
+                        },
+                        yaxis: {
+                            axisLabel: "GPA",
+                            min: 2,
+                            max: 4
+                        },
+                        series: {
+                            points: {
+                                radius: 3
+                            }
+                        },
+                        colors: ["#000080"]
+                    });
+                    $('#current_course').append('<div id="graph_legend"><br><ul class="legend"><li>' +
+                        '<span class="course0"></span>GPA Average at FIU</li></ul><br></div>');
                 }
-
-                var data2 = [avg]; //data to plot
-
-                $.plot($('#placeholder'), data2, {
-                    xaxis: {
-                        axisLabel: "Semester",
-                        ticks: ticks
-                    },
-                    yaxis: {
-                        axisLabel: "GPA",
-                        min: 2,
-                        max: 4
-                    },
-                    series: {
-                        points: {
-                            radius: 3
-                        }
-                    },
-                    colors: ["#000080"]
-                });
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                 alert(errorThrown);

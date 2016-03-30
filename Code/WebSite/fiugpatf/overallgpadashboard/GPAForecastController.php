@@ -19,7 +19,7 @@ class GPAForecastController {
     {
         $this->userID = $userID;
         $this->username = $username;
-        //$this->log = new ErrorLog();
+        $this->log = new ErrorLog();
     }
 
     function GPAGoal() {
@@ -31,7 +31,7 @@ class GPAForecastController {
         $output = $db->select($stmt, $params);
 
         if($output[0][0] == "") {
-            toLog(2, "ERROR", __METHOD__, "GPA Goal is null");
+            $this->log->toLog(2, __METHOD__, "GPA Goal is null");
         }
 
         for ($i = 0, $c = count($output); $i < $c; $i++) {
@@ -52,8 +52,10 @@ class GPAForecastController {
         $params = array($this->userID);
         $output = $db->select($stmt, $params);
 
-        if($output[0][0] == "") {
-            toLog(2, "ERROR", __METHOD__, "creditsTaken is null");
+        if($output[0][0] == '') {
+            $this->log->toLog(2, __METHOD__, "No previous course information available");
+            echo json_encode('No grades');
+            return;
         }
 
         for ($i = 0, $c = count($output); $i < $c; $i++) {
@@ -75,11 +77,11 @@ class GPAForecastController {
         $params = array($this->userID);
         $output = $db->select($stmt, $params);
 
-        if($output[0][0] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseGrade is null");
-        }
-        else if($output[0][1] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseCredits is null");
+        if(count($output) == 0)
+        {
+            $this->log->toLog(2, __METHOD__, "No course grades or course credits");
+            echo json_encode('No grades');
+            return;
         }
 
         for ($i = 0, $c = count($output); $i < $c; $i++) {
@@ -102,20 +104,19 @@ class GPAForecastController {
         $params = array($this->userID);
         $output = $db->select($stmt, $params);
 
-        if ($output[0][0] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseID is null");
-        } else if ($output[0][1] == "") {
-            toLog(2, "ERROR", __METHOD__, "courseName is null");
-        } else if ($output[0][2] == "") {
-            toLog(2, "ERROR", __METHOD__, "credits is null");
+        if(count($output) == 0)
+        {
+            $this->log->toLog(2, __METHOD__, "No course information available");
+            echo json_encode([]);
+            return;
         }
 
         for ($i = 0, $c = count($output); $i < $c; $i++) {
 
             if ($output[$i][3] == "") {
-                toLog(3, "WARNING", __METHOD__, "weight is null");
+                $this->log->toLog(3, __METHOD__, "weight is null");
             } else if ($output[$i][4] == "") {
-                toLog(3, "WARNING", __METHOD__, "relevance is null");
+                $this->log->toLog(3, __METHOD__, "relevance is null");
             }
 
             $courseID = $output[$i][0];
