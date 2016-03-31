@@ -104,7 +104,7 @@ if($action == "importData") {
 if($action == "deleteData") {
 	if(isset($_SESSION['username'])){
 		$user = $_SESSION['userID'];
-		$mysqli = new mysqli("localhost","root","sqliscool","GPA_Tracker");
+		$mysqli = new mysqli("localhost","sec_user","Uzg82t=u%#bNgPJw","GPA_Tracker");
         $stmt = $mysqli->prepare("DELETE from StudentCourse WHERE userID = ?");
         $stmt->bind_param('s', $user);
         $stmt->execute();
@@ -151,7 +151,7 @@ if($action == "importReq") {
 	$file = file_get_contents($_FILES['file']['tmp_name']);
 	$adminData = simplexml_load_string($file);
 	
-	if($adminData == false)
+	if($adminData === false)
 	{
 		echo "Error loading string. Check File.";
 	}
@@ -163,19 +163,25 @@ if($action == "importReq") {
 
 function importDataAdmin($adminData){
 	$mysqli = new mysqli("localhost","sec_user","Uzg82t=u%#bNgPJw","GPA_Tracker");
+	echo "here0\n";
 	foreach($adminData->database[0]->children() as $table_data)
 	{
+		echo "here\n";
 		foreach($table_data->children() as $rows)
 		{
+			echo "here1\n";
 			if($table_data['name'] == 'MajorBucket')
 			{
+				echo "here2\n";
 				if($rows->field[7] == "null")
 				{
+					echo "here3\n";
 					$majorID = $rows->field[0];
 					$stmt = $mysqli->prepare("INSERT INTO MajorBucket (majorID, dateStart, dateEnd, description, allRequired, quantityNeeded, quantification, parentID) VALUES (?, ?, ?, ?, ?, ?, ?, null)
                                           ON DUPLICATE KEY UPDATE dateStart=VALUES(dateStart), dateEnd=VALUES(dateEnd), allRequired=VALUES(allRequired), quantification=VALUES(quantification), parentID=VALUES(parentID)");
 					$stmt->bind_param('sssssss', $rows->field[0], $rows->field[1], $rows->field[2], $rows->field[3], $rows->field[4], $rows->field[5], $rows->field[6]);
 					$stmt->execute();
+					echo "here4\n";
 				}
 				else
 				{

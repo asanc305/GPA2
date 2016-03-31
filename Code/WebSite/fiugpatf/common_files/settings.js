@@ -7,7 +7,7 @@ function start() {
 
     $.ajax({
         type: 'POST',
-        url: 'settings.php',
+        url: 'settingsrouter.php',
         data: {
             action: 'prepareTable'},
         dataType: 'json',
@@ -35,35 +35,58 @@ function start() {
 					deleteData();
 				}
 			});
+
+			$('#DeleteProgramButton').click(function(){
+				var del = confirm("Delete Program");
+				if (del == true) {
+					deleteProgram();
+				}
+			});
 			
-			var options = { 
-				success:    function() { 
-					alert('PDF imported successfully!'); 
+			var options = {
+				dataType: 'json',
+				success:    function(data) {
+						alert('PDF imported successfully!');
 				},
 				error:      function(){
 					alert('Error in loading php file.');
 				}
 			};
+
+			var options1 = {
+				success:    function(data) {
+					if (data[3] == 's')
+						alert('PDF imported successfully!');
+					else
+						alert("Error loading XML file");
+				},
+				error:      function(){
+					alert('Error in loading php file.');
+				}
+			};
+
 			$('#PDFimport').ajaxForm(options);
 			$('#PDFimport').submit(function(){
 				//$('#PDFimport').ajaxSubmit();
 				return false;
 			});
+
+			$('#Reqimport').ajaxForm(options1);
+
 			var control = document.getElementById("Whatif");
 				control.addEventListener("change", function(){
 					$('#PDFimport').trigger("submit");
 				}, false);
-			$('#Reqimport').ajaxForm();
+
 			var control = document.getElementById("ImportReqirments");
 				control.addEventListener("change", function(){
-					$('#Reqimport').ajaxSubmit();
+					$('#Reqimport').trigger("submit");
 				}, false);
         }
     });
 }
 
-function exportData()
-{
+function exportData() {
 	$.ajax({
         type: 'POST',
         url: 'settings.php',
@@ -82,8 +105,7 @@ function exportData()
 }
 
 
-function deleteData()
-{
+function deleteData() {
 	$.ajax({
         type: 'POST',
         url: 'settings.php',
@@ -100,8 +122,25 @@ function deleteData()
 		}
 	});
 }
-function importData()
-{
+
+function deleteProgram() {
+	$.ajax({
+		type: 'POST',
+		url: 'settingsrouter.php',
+		data: {
+			action: 'deleteProgram'},
+		dataType: 'text',
+		success: function(data) {
+			if(data.length > 0){
+				alert("Data deleted.");
+			}
+		},
+		error: function(XMLHttpRequest, textStatus, errorThrown){
+			alert(errorThrown);
+		}
+	});
+}
+function importData() {
 	document.getElementById("ImportFile").click();
 	var control = document.getElementById("ImportFile");
 	control.addEventListener("change", function(event) {
@@ -143,8 +182,7 @@ function importData()
 
 }
 
-function importWhatif()
-{
+function importWhatif() {
 	document.getElementById("Whatif").click();
 	var control = document.getElementById("Whatif");
 	control.addEventListener("change", function(event) {

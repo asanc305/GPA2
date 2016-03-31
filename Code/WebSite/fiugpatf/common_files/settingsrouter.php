@@ -2,7 +2,7 @@
 
 include_once 'settingscontroller.php';
 
-class Router
+class SettingsRouter
 {
    protected $action;
    protected $session_name = 'sec_session_id';
@@ -43,6 +43,18 @@ class Router
             $controller = new SettingsController($_SESSION['userID'], $_SESSION['username']);
             $controller-> $action();
             break;
+         case "prepareTable":
+            $controller = new SettingsController($_SESSION['userID'], $_SESSION['username']);
+            $controller-> $action();
+            break;
+         case "importReq":
+            $controller = new SettingsController($_SESSION['userID'], $_SESSION['username']);
+            $controller-> $action();
+            break;
+          case "deleteProgram":
+              $controller = new SettingsController($_SESSION['userID'], $_SESSION['username']);
+              $controller-> $action();
+              break;
       }
    }
 }
@@ -52,4 +64,4 @@ if (isset($_POST['action']))
 else
    $action = $_POST['action'];
 
-$pageRouter = new Router($action);
+$pageRouter = new SettingsRouter($action);
